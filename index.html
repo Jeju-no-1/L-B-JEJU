@@ -1,0 +1,2354 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LOCALBOOST — 제주 여행자를 위한 손그림 지도</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --paper: #FFFFFF;
+    --paper-2: #FAFAFA;
+    --paper-3: #F2F2F2;
+    --paper-4: #EAEAEA;
+    --ink: #0F0F0F;
+    --ink-mid: #4A4A4A;
+    --ink-soft: #767676;
+    --ink-deep: #000000;
+    --accent: #B8432B;
+    --accent-soft: #D9A37F;
+    --line: #E5E5E5;
+    --line-soft: #F0F0F0;
+  }
+  html, body {
+    background: var(--paper); color: var(--ink);
+    font-family: 'Pretendard', 'Inter', system-ui, -apple-system, sans-serif;
+    font-weight: 400;
+    line-height: 1.65; -webkit-font-smoothing: antialiased;
+    word-break: keep-all; overflow-wrap: break-word;
+    letter-spacing: -0.005em;
+  }
+  body { overflow-x: hidden; min-height: 100vh; }
+
+  header.masthead {
+    position: relative; z-index: 10;
+    border-bottom: 1px solid var(--line);
+    padding: 16px 36px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 24px; align-items: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.22em; text-transform: uppercase;
+  }
+  header.masthead .left { display: flex; align-items: baseline; gap: 14px; color: var(--ink); }
+  header.masthead .logo {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600; font-size: 13px;
+    letter-spacing: 0.28em; color: var(--ink-deep);
+  }
+  header.masthead .left .tag {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; color: var(--ink-soft);
+    font-size: 12px; letter-spacing: 0.04em;
+    text-transform: none;
+  }
+  header.masthead .lang {
+    display: flex; gap: 0;
+    font-family: 'Pretendard', sans-serif;
+    font-size: 12.5px; letter-spacing: 0.04em;
+    border: 1px solid var(--ink);
+  }
+  header.masthead .lang button {
+    background: transparent; border: 0; color: var(--ink);
+    padding: 7px 12px; cursor: pointer;
+    font-family: inherit; font-size: inherit;
+    border-right: 1px solid var(--ink);
+    transition: background 0.15s, color 0.15s; line-height: 1;
+  }
+  header.masthead .lang button:last-child { border-right: 0; }
+  header.masthead .lang button.active { background: var(--ink); color: var(--paper); }
+  header.masthead .lang button:hover:not(.active) { background: var(--paper-2); }
+  header.masthead .right { text-align: right; color: var(--ink-soft); }
+  header.masthead .right strong {
+    font-weight: 600; color: var(--ink);
+    letter-spacing: 0.18em;
+  }
+
+  .intro {
+    text-align: center; padding: 90px 32px 40px;
+    position: relative; z-index: 5;
+    opacity: 0; transform: translateY(20px);
+    animation: introIn 1.2s cubic-bezier(.2,.8,.2,1) 0.3s forwards;
+  }
+  .intro .vol {
+    font-family: 'Inter', sans-serif;
+    font-size: 10.5px; font-weight: 500;
+    letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--ink-soft); margin-bottom: 24px;
+  }
+  .intro .vol::before, .intro .vol::after {
+    content: '·'; margin: 0 14px; color: var(--ink-soft);
+  }
+  .intro h1 {
+    font-family: 'Caveat', cursive;
+    font-weight: 600; font-style: normal;
+    font-size: clamp(64px, 10vw, 110px);
+    line-height: 0.95; letter-spacing: 0.005em;
+    color: var(--ink-deep); margin-bottom: 24px;
+  }
+  .intro h1 .title-row {
+    display: inline-flex; align-items: center; gap: 18px;
+    flex-wrap: nowrap; justify-content: center;
+  }
+  .intro h1 .mini-jeju {
+    width: clamp(56px, 7vw, 88px);
+    height: auto;
+    flex-shrink: 0;
+    opacity: 0.85;
+    transform: translateY(-4px);
+  }
+  .intro h1 .mini-jeju path {
+    fill: none;
+    stroke: var(--ink-deep);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .intro h1 .mini-jeju .peak {
+    stroke-width: 1.6; opacity: 0.7;
+  }
+  .intro h1 em {
+    font-family: 'Pretendard', sans-serif;
+    font-style: normal; font-weight: 300;
+    color: var(--ink-mid); letter-spacing: -0.015em;
+    display: block;
+    font-size: clamp(18px, 3vw, 26px);
+    margin-top: 18px;
+    line-height: 1.4;
+  }
+  .intro .lede {
+    font-family: 'Pretendard', sans-serif;
+    font-size: 15.5px; max-width: 560px; margin: 0 auto 16px;
+    color: var(--ink-mid); line-height: 1.75;
+  }
+  .intro .multi {
+    font-family: 'Inter', sans-serif;
+    font-size: 10.5px; font-weight: 500;
+    color: var(--ink-soft); letter-spacing: 0.28em;
+    text-transform: uppercase; margin-top: 10px;
+  }
+  @keyframes introIn { to { opacity: 1; transform: translateY(0); } }
+
+  .stage { position: relative; z-index: 1; padding: 24px 24px 50px; max-width: 1320px; margin: 0 auto; }
+  .map-frame { position: relative; aspect-ratio: 12 / 7; width: 100%; }
+  .jeju-svg { width: 100%; height: 100%; display: block; }
+  .map-hint {
+    text-align: center;
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+    font-weight: 500;
+    font-size: clamp(13px, 1.6vw, 16px);
+    color: var(--ink-mid);
+    letter-spacing: 0.04em;
+    margin: 22px 0 6px;
+    opacity: 0.78;
+  }
+  .map-hint::before, .map-hint::after {
+    content: '·'; margin: 0 10px; color: var(--ink-soft);
+  }
+
+  .draw-path {
+    fill: none; stroke: var(--ink-deep);
+    stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: var(--len, 4000);
+    stroke-dashoffset: var(--len, 4000);
+    pointer-events: none;
+  }
+  .draw-path.faint { stroke: var(--ink-soft); opacity: 0.45; stroke-width: 0.8; }
+  .draw-path.main { stroke: var(--ink-deep); stroke-width: 1.6; opacity: 0.95; }
+  .draw-path.shade { stroke: var(--ink-mid); stroke-width: 0.7; opacity: 0.45; }
+  .draw-path.detail { stroke: var(--ink-deep); stroke-width: 1.2; opacity: 0.88; }
+  .draw-path.thin { stroke: var(--ink-mid); stroke-width: 0.9; opacity: 0.7; }
+
+  .play .underdraw .draw-path { animation: draw 1.4s ease-out forwards; }
+  .play .coastline .draw-path { animation: draw 3.0s cubic-bezier(.4,.1,.3,1) 0.6s forwards; }
+  .play .retrace .draw-path   { animation: draw 1.8s ease-out 2.4s forwards; }
+  .play .mountain .draw-path  { animation: draw 0.9s ease-out 3.2s forwards; }
+  .play .boundaries .draw-path:nth-child(1)  { animation: draw 0.55s ease-out 3.6s forwards; }
+  .play .boundaries .draw-path:nth-child(2)  { animation: draw 0.55s ease-out 3.7s forwards; }
+  .play .boundaries .draw-path:nth-child(3)  { animation: draw 0.55s ease-out 3.8s forwards; }
+  .play .boundaries .draw-path:nth-child(4)  { animation: draw 0.55s ease-out 3.9s forwards; }
+  .play .boundaries .draw-path:nth-child(5)  { animation: draw 0.55s ease-out 4.0s forwards; }
+  .play .boundaries .draw-path:nth-child(6)  { animation: draw 0.55s ease-out 4.1s forwards; }
+  .play .boundaries .draw-path:nth-child(7)  { animation: draw 0.55s ease-out 4.2s forwards; }
+  .play .boundaries .draw-path:nth-child(8)  { animation: draw 0.55s ease-out 4.3s forwards; }
+  .play .boundaries .draw-path:nth-child(9)  { animation: draw 0.55s ease-out 4.4s forwards; }
+  .play .boundaries .draw-path:nth-child(10) { animation: draw 0.55s ease-out 4.5s forwards; }
+  .play .boundaries .draw-path:nth-child(11) { animation: draw 0.55s ease-out 4.6s forwards; }
+  .play .boundaries .draw-path:nth-child(12) { animation: draw 0.55s ease-out 4.7s forwards; }
+  .play .boundaries .draw-path:nth-child(13) { animation: draw 0.55s ease-out 4.8s forwards; }
+  .play .hatch .draw-path     { animation: draw 1.4s ease-out 4.0s forwards; }
+  .play .waves .draw-path     { animation: draw 1.3s ease-out 4.2s forwards; }
+  .play .airport-grp .draw-path { animation: draw 0.8s ease-out 5.0s forwards; }
+  .play .deco .draw-path      { animation: draw 1.0s ease-out 5.2s forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  .pencil-cursor { opacity: 0; pointer-events: none; }
+  .play .pencil-cursor {
+    animation: pencilFade 0.3s ease-out 0.6s forwards, pencilOut 0.4s ease-in 5.6s forwards;
+  }
+  @keyframes pencilFade { to { opacity: 1; } }
+  @keyframes pencilOut { to { opacity: 0; } }
+
+  .region-area {
+    fill: var(--accent); fill-opacity: 0;
+    stroke: var(--ink); stroke-width: 0;
+    transition: fill-opacity 0.25s, stroke-width 0.25s;
+    cursor: pointer; pointer-events: all;
+  }
+  .region-area:hover { fill-opacity: 0.06; stroke-width: 1; stroke-dasharray: 3 4; }
+  .region-area.active { fill-opacity: 0.10; stroke-width: 1.5; stroke-dasharray: 4 3; }
+
+  .region-label { cursor: pointer; opacity: 0; }
+  .play .region-label { animation: labelIn 0.5s ease-out forwards; }
+  .play .region-label:nth-child(1)  { animation-delay: 5.00s; }
+  .play .region-label:nth-child(2)  { animation-delay: 5.05s; }
+  .play .region-label:nth-child(3)  { animation-delay: 5.10s; }
+  .play .region-label:nth-child(4)  { animation-delay: 5.15s; }
+  .play .region-label:nth-child(5)  { animation-delay: 5.20s; }
+  .play .region-label:nth-child(6)  { animation-delay: 5.25s; }
+  .play .region-label:nth-child(7)  { animation-delay: 5.30s; }
+  .play .region-label:nth-child(8)  { animation-delay: 5.35s; }
+  .play .region-label:nth-child(9)  { animation-delay: 5.40s; }
+  .play .region-label:nth-child(10) { animation-delay: 5.45s; }
+  .play .region-label:nth-child(11) { animation-delay: 5.50s; }
+  .play .region-label:nth-child(12) { animation-delay: 5.55s; }
+  .play .region-label:nth-child(13) { animation-delay: 5.60s; }
+  @keyframes labelIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .region-label text.name {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 700; font-size: 14px;
+    fill: var(--ink-deep); letter-spacing: -0.01em;
+    paint-order: stroke; stroke: var(--paper);
+    stroke-width: 4px; stroke-linejoin: round;
+    transition: fill 0.2s;
+  }
+  .region-label text.name-en {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 10px;
+    fill: var(--ink-soft); letter-spacing: 0.06em;
+    paint-order: stroke; stroke: var(--paper);
+    stroke-width: 3px; stroke-linejoin: round;
+    transition: fill 0.2s;
+  }
+  .region-label:hover text.name { fill: var(--accent); }
+  .region-label:hover text.name-en { fill: var(--accent); }
+
+  .airport-label-grp { opacity: 0; }
+  .play .airport-label-grp { animation: fadeIn 0.5s ease-out 5.6s forwards; }
+  .airport-label-grp text.ko {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 600; font-size: 12px;
+    fill: var(--ink); letter-spacing: 0.04em;
+    paint-order: stroke; stroke: var(--paper); stroke-width: 3px;
+  }
+  .airport-label-grp text.en {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 10px;
+    fill: var(--ink-soft); letter-spacing: 0.18em;
+    paint-order: stroke; stroke: var(--paper); stroke-width: 3px;
+  }
+
+  .journey-path {
+    fill: none; stroke: var(--accent);
+    stroke-width: 1.7; stroke-linecap: round;
+    stroke-dasharray: 4 5; opacity: 0.88; pointer-events: none;
+  }
+  .journey-flag { pointer-events: none; opacity: 0; transition: opacity 0.3s ease-out; }
+  .journey-flag.show { opacity: 1; }
+  .journey-pulse { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0; }
+  .journey-pulse.go { animation: pulse 1.6s ease-out forwards; }
+  @keyframes pulse {
+    0% { r: 6; opacity: 0.7; }
+    100% { r: 28; opacity: 0; }
+  }
+
+  .replay {
+    position: absolute; bottom: 12px; right: 12px;
+    background: transparent; border: 1px solid var(--ink);
+    color: var(--ink); padding: 8px 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 13px;
+    cursor: pointer; border-radius: 999px;
+    transition: all 0.2s; opacity: 0; z-index: 5;
+  }
+  .play .replay { animation: fadeIn 0.4s ease-out 6.2s forwards; }
+  .replay:hover { background: var(--ink); color: var(--paper); }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  .hint {
+    text-align: center; margin-top: 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 14px;
+    color: var(--ink-soft); opacity: 0;
+  }
+  .play .hint { animation: fadeIn 0.6s ease-out 6.2s forwards; }
+  .hint .step { display: inline-block; margin: 0 14px; }
+  .hint .step .num {
+    display: inline-block;
+    width: 18px; height: 18px; line-height: 18px;
+    font-size: 11px; font-weight: 600;
+    border-radius: 50%; background: var(--ink); color: var(--paper);
+    margin-right: 6px; text-align: center;
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+  }
+
+  .region-stats {
+    text-align: center; margin-top: 26px; padding: 18px 24px;
+    border-top: 1px solid rgba(0,0,0,0.12);
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+    display: flex; justify-content: center; gap: 50px;
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--ink-mid); font-size: 13px;
+    letter-spacing: 0.06em; opacity: 0;
+  }
+  .play .region-stats { animation: fadeIn 0.6s ease-out 6.4s forwards; }
+  .region-stats .stat strong {
+    display: block;
+    font-family: 'Pretendard', sans-serif;
+    font-style: normal; font-size: 28px;
+    color: var(--ink-deep); line-height: 1;
+    margin-bottom: 4px; letter-spacing: -0.02em;
+  }
+
+  /* Panel — overlays the map area (absolute positioned within .stage) */
+  .biz-panel {
+    position: absolute; top: 12px; right: 12px;
+    width: min(300px, calc(100% - 24px));
+    max-height: min(72vh, 540px);
+    background: var(--paper); border: 1px solid var(--ink);
+    transform: translateX(calc(100% + 24px));
+    opacity: 0; visibility: hidden;
+    transition: transform 0.35s cubic-bezier(.2,.8,.2,1), opacity 0.25s, visibility 0s linear 0.3s;
+    z-index: 50; display: flex; flex-direction: column;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .biz-panel.open {
+    transform: translateX(0); opacity: 1; visibility: visible;
+    transition: transform 0.35s cubic-bezier(.2,.8,.2,1), opacity 0.25s, visibility 0s;
+  }
+  .biz-panel.left-side {
+    right: auto; left: 12px;
+    transform: translateX(calc(-100% - 24px));
+  }
+  .biz-panel.left-side.open { transform: translateX(0); }
+  /* Locked state indicator */
+  .biz-panel.locked header::before {
+    content: ''; position: absolute;
+    top: 8px; right: 56px;
+    width: 7px; height: 7px;
+    background: var(--accent); border-radius: 50%;
+  }
+  .biz-panel header { position: relative; }
+  @media (max-width: 640px) {
+    /* 모바일: 어느 권역을 누르든 항상 화면 하단(고정)에서 슬라이드업 */
+    .biz-panel {
+      position: fixed !important;
+      top: auto !important;
+      bottom: 0 !important;
+      left: 0 !important; right: 0 !important;
+      width: 100% !important;
+      max-height: 65vh;
+      transform: translateY(100%) !important;
+      border-radius: 16px 16px 0 0;
+      border-left: 0; border-right: 0; border-bottom: 0;
+      box-shadow: 0 -12px 32px rgba(0,0,0,0.15);
+    }
+    .biz-panel.open { transform: translateY(0) !important; }
+  }
+
+  .biz-panel header { padding: 16px 20px 14px; border-bottom: 1px solid var(--ink); }
+  .panel-top-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 10px; margin-bottom: 2px;
+  }
+  .panel-back {
+    display: none;
+    background: transparent; border: 0;
+    color: var(--ink-mid); cursor: pointer;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 11.5px;
+    padding: 3px 0; margin-bottom: 6px;
+    letter-spacing: 0.03em; transition: color 0.15s;
+  }
+  .panel-back:hover { color: var(--accent); }
+  .panel-back.show { display: inline-block; }
+  .panel-meta {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.08em; margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .biz-panel h2 {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 700; font-size: 20px;
+    line-height: 1.15; letter-spacing: -0.02em;
+    color: var(--ink-deep);
+  }
+  .biz-panel h2 small {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-weight: 400;
+    font-size: 12px; color: var(--ink-soft);
+    margin-top: 2px; letter-spacing: 0.02em;
+  }
+  .panel-close {
+    background: transparent; border: 1px solid var(--ink);
+    color: var(--ink); width: 26px; height: 26px;
+    border-radius: 50%; cursor: pointer;
+    font-size: 13px; line-height: 1;
+    flex-shrink: 0; transition: all 0.15s;
+  }
+  .panel-close:hover { background: var(--ink); color: var(--paper); }
+  .panel-body { overflow-y: auto; flex: 1; }
+
+  .cat-list { list-style: none; padding: 0; }
+  .cat-list li {
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    cursor: pointer; transition: background 0.15s;
+    display: grid; grid-template-columns: 26px 22px 1fr auto auto;
+    gap: 10px; align-items: center;
+  }
+  .cat-list li:hover { background: var(--paper-2); }
+  .cat-list .cat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 14px;
+    color: var(--accent); font-weight: 600;
+  }
+  .cat-list .cat-icon { width: 22px; height: 22px; color: var(--ink-deep); flex-shrink: 0; }
+  .cat-list .cat-icon svg { width: 100%; height: 100%; }
+  .cat-list .cat-name {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 700; font-size: 14.5px;
+    color: var(--ink-deep); letter-spacing: -0.01em;
+  }
+  .cat-list .cat-name small {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-weight: 400;
+    font-size: 10.5px; color: var(--ink-soft); margin-top: 1px;
+  }
+  .cat-list .cat-count {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 11px;
+    color: var(--ink-mid);
+  }
+  .cat-list .cat-count strong {
+    font-family: 'Pretendard', sans-serif;
+    font-style: normal; font-weight: 700;
+    color: var(--ink-deep); font-size: 14px; margin-right: 2px;
+  }
+  .cat-list .arrow { color: var(--ink-soft); font-size: 13px; }
+  .cat-list li:hover .arrow { color: var(--accent); }
+
+  .biz-list { list-style: none; padding: 0; }
+  .biz-list li {
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    cursor: pointer; transition: background 0.15s;
+    display: grid; grid-template-columns: 24px 1fr auto;
+    gap: 10px; align-items: start;
+  }
+  .biz-list li:hover { background: var(--paper-2); }
+  .biz-list .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 14px;
+    color: var(--accent); font-weight: 600; line-height: 1.4;
+  }
+  .biz-list .body h3 {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 600; font-size: 13.5px;
+    line-height: 1.3; letter-spacing: -0.01em;
+    margin-bottom: 3px; color: var(--ink-deep);
+  }
+  .biz-list .body .stars-mini {
+    font-family: serif; color: var(--accent);
+    font-size: 10.5px; letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+  .biz-list .body .stars-mini .num {
+    color: var(--ink-mid); font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 10.5px; margin-left: 3px;
+  }
+  .biz-list .body .badge-row {
+    display: inline-flex; gap: 4px; margin-bottom: 4px;
+  }
+  .biz-list .body .new-badge,
+  .biz-list .body .local-badge {
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+    font-size: 8.5px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 2px 6px; line-height: 1.4;
+  }
+  .biz-list .body .new-badge { background: var(--ink); color: var(--paper); }
+  .biz-list .body .local-badge { background: #C5572C; color: var(--paper); }
+
+  /* Modal badges */
+  .modal .badge-row {
+    display: inline-flex; gap: 6px; align-items: center;
+    margin-right: 10px;
+  }
+  .modal .new-badge-large,
+  .modal .local-badge-large {
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 5px 12px;
+  }
+  .modal .new-badge-large { background: var(--ink); color: var(--paper); }
+  .modal .local-badge-large { background: #C5572C; color: var(--paper); }
+
+  .biz-list .body .place {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 10.5px;
+    color: var(--ink-soft); letter-spacing: 0.03em;
+  }
+  .biz-list .arrow { color: var(--ink-soft); font-size: 13px; line-height: 1.4; }
+  .biz-list li:hover .arrow { color: var(--accent); }
+
+  .empty {
+    padding: 30px 20px; text-align: center;
+    color: var(--ink-soft);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 12px; line-height: 1.6;
+  }
+  .empty strong {
+    display: block;
+    font-family: 'Pretendard', sans-serif;
+    font-style: normal; font-weight: 500;
+    color: var(--ink); font-size: 13.5px;
+    margin-bottom: 6px;
+  }
+
+  /* Modal */
+  .modal-back {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(3px);
+    z-index: 100; display: none;
+    align-items: center; justify-content: center;
+    padding: 24px; opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .modal-back.open { display: flex; opacity: 1; }
+  .modal {
+    background: var(--paper); border: 1px solid var(--ink);
+    width: 100%; max-width: 580px;
+    max-height: 90vh; overflow-y: auto;
+    transform: scale(0.96);
+    transition: transform 0.3s cubic-bezier(.2,.8,.2,1);
+    position: relative;
+  }
+  .modal-back.open .modal { transform: scale(1); }
+  .modal .modal-head { padding: 28px 32px 22px; }
+  .modal-close {
+    position: absolute; top: 20px; right: 20px;
+    background: var(--paper); border: 1px solid var(--ink);
+    color: var(--ink); width: 34px; height: 34px;
+    border-radius: 50%; cursor: pointer;
+    font-size: 16px; line-height: 1;
+    transition: all 0.15s; z-index: 10;
+  }
+  .modal-close:hover { background: var(--ink); color: var(--paper); }
+  .modal .cat {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 13px;
+    color: var(--accent); text-transform: uppercase;
+    letter-spacing: 0.16em; margin-bottom: 12px;
+  }
+  .modal h2 {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 800; font-size: 30px;
+    line-height: 1.18; letter-spacing: -0.02em;
+    margin-bottom: 8px; color: var(--ink-deep);
+  }
+  .modal .place-line {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 12px; letter-spacing: 0.04em;
+  }
+  .modal .journey-meta {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 12.5px;
+    color: var(--accent);
+    background: rgba(184,67,43,0.08);
+    padding: 6px 12px;
+    border: 1px dashed rgba(184,67,43,0.4);
+  }
+
+  /* Slide with photo — fill entire area */
+  .modal .slide.has-photo { padding: 0; gap: 0; }
+  .modal .slide.has-photo .slide-icon {
+    width: 100%; height: 100%; opacity: 1;
+    display: block;
+  }
+  .modal .slide.has-photo .slide-icon img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+  .modal .slide.has-photo .slide-caption {
+    position: absolute; bottom: 14px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(6px);
+    z-index: 2;
+  }
+
+  /* Slideshow */
+  .modal .slideshow {
+    position: relative;
+    height: 320px; overflow: hidden;
+    border-top: 1px solid rgba(0,0,0,0.10);
+    border-bottom: 1px solid rgba(0,0,0,0.10);
+    background: var(--paper-2);
+  }
+  .modal .slides {
+    display: flex; height: 100%;
+    transition: transform 0.5s cubic-bezier(.2,.8,.2,1);
+  }
+  .modal .slide {
+    flex: 0 0 100%; height: 100%;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 18px;
+  }
+  .modal .slide[data-tone="1"] { background: linear-gradient(135deg, #E6DBBE 0%, #DBCCA5 100%); }
+  .modal .slide[data-tone="2"] { background: linear-gradient(135deg, #DBCCA5 0%, #C4B689 100%); }
+  .modal .slide[data-tone="3"] { background: linear-gradient(135deg, #C4B689 0%, #E6DBBE 100%); }
+  .modal .slide-icon {
+    width: 80px; height: 80px;
+    color: var(--ink-deep); opacity: 0.32;
+  }
+  .modal .slide-icon svg { width: 100%; height: 100%; }
+  .modal .slide-caption {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 12px;
+    color: var(--ink-mid); letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: var(--paper); padding: 5px 14px;
+    border: 1px solid var(--ink-soft);
+    border-radius: 999px;
+  }
+  .modal .slide-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: var(--paper); border: 1px solid var(--ink);
+    color: var(--ink); width: 36px; height: 36px;
+    border-radius: 50%; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; line-height: 1;
+    transition: all 0.15s; z-index: 2;
+    font-family: 'Pretendard', sans-serif;
+  }
+  .modal .slide-prev { left: 14px; }
+  .modal .slide-next { right: 14px; }
+  .modal .slide-arrow:hover { background: var(--ink); color: var(--paper); }
+  .modal .slide-dots {
+    position: absolute; bottom: 14px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 6px; z-index: 2;
+  }
+  .modal .slide-dot {
+    width: 7px; height: 7px;
+    border-radius: 999px;
+    background: rgba(31,79,54,0.3);
+    transition: all 0.25s; cursor: pointer;
+  }
+  .modal .slide-dot.active {
+    background: var(--ink); width: 22px;
+  }
+
+  /* Body */
+  .modal .body { padding: 26px 32px 30px; }
+
+  /* Rating row */
+  .modal .rating-row {
+    display: flex; align-items: baseline; gap: 12px;
+    padding-bottom: 18px; margin-bottom: 18px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .modal .stars {
+    color: var(--accent);
+    font-size: 18px; letter-spacing: 2px;
+    font-family: serif;
+  }
+  .modal .rating-num strong {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 800; font-size: 22px;
+    color: var(--ink-deep);
+  }
+  .modal .rating-num small {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 400; font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .modal .rating-count {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 13px;
+    color: var(--ink-mid); margin-left: auto;
+  }
+
+  /* Description */
+  .modal .desc {
+    font-size: 16px; line-height: 1.75;
+    margin-bottom: 22px; color: var(--ink);
+  }
+
+  /* Highlights */
+  .modal .highlights { margin-bottom: 24px; }
+  .modal .highlights h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 13px;
+    color: var(--ink-soft);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 12px; font-weight: 400;
+  }
+  .modal .highlights ul {
+    list-style: none; display: grid; gap: 9px;
+  }
+  .modal .highlights li {
+    font-family: 'Pretendard', sans-serif;
+    font-size: 14.5px; line-height: 1.5;
+    color: var(--ink); padding-left: 22px;
+    position: relative;
+  }
+  .modal .highlights li::before {
+    content: ''; position: absolute;
+    left: 0; top: 8px;
+    width: 8px; height: 8px;
+    background: var(--accent); border-radius: 50%;
+  }
+
+  .modal dl {
+    display: grid; grid-template-columns: auto 1fr;
+    gap: 10px 20px; padding: 16px 0;
+    border-top: 1px solid rgba(0,0,0,0.10);
+    border-bottom: 1px solid rgba(0,0,0,0.10);
+    margin-bottom: 24px;
+  }
+  .modal dt {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 13px;
+    color: var(--ink-soft);
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .modal dd { font-size: 14px; color: var(--ink); }
+  .modal .channel-buttons {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .modal .channel-buttons.two { grid-template-columns: 1fr 1fr; }
+  .modal .channel-buttons.three { grid-template-columns: 1fr 1fr 1fr; }
+  .modal .channel-btn {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    padding: 13px 16px;
+    text-decoration: none;
+    border: 1px solid var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    transition: all 0.15s;
+    color: var(--ink); background: var(--bg, #fff);
+  }
+  .modal .channel-btn:hover { background: var(--ink); color: var(--paper); }
+  .modal .channel-btn.primary { background: var(--ink); color: var(--paper); }
+  .modal .channel-btn.primary:hover { background: var(--accent); border-color: var(--accent); }
+  .modal .channel-btn .icon {
+    font-size: 14px; line-height: 1; letter-spacing: 0;
+  }
+  .modal .channel-btn.kakao { background: #FEE500; color: #381F1F; border-color: #FEE500; }
+  .modal .channel-btn.kakao:hover { background: #FFD700; border-color: #FFD700; }
+  .modal .channel-empty {
+    text-align: center; padding: 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 13px;
+    color: var(--ink-soft);
+    border: 1px dashed var(--line);
+  }
+  .modal .detail-btn {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--ink-deep); color: var(--paper);
+    text-decoration: none; padding: 16px 28px;
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 500; font-size: 15px;
+    letter-spacing: 0.02em;
+    transition: background 0.15s;
+  }
+  .modal .detail-btn:hover { background: var(--accent); }
+  .modal .detail-btn .arrow {
+    margin-left: 10px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 18px;
+  }
+  .modal .return-note {
+    background: var(--paper-2); color: var(--ink-mid);
+    padding: 14px 18px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 12.5px; line-height: 1.5;
+    border: 1px solid rgba(0,0,0,0.05);
+    margin-top: 12px;
+  }
+  .modal .read-only-note {
+    margin-top: 12px;
+    text-align: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 11.5px;
+    color: var(--ink-soft);
+    letter-spacing: 0.08em;
+  }
+
+  footer.foot {
+    border-top: 1px solid var(--ink);
+    padding: 48px 40px 30px;
+    color: var(--ink);
+    position: relative; z-index: 5;
+    max-width: 1120px; margin: 0 auto;
+  }
+  footer.foot .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin: 0 auto 28px;
+    border: 1px solid var(--ink);
+    max-width: 880px;
+  }
+  @media (max-width: 720px) {
+    footer.foot .contact-grid { grid-template-columns: 1fr; }
+  }
+  footer.foot .contact-block {
+    padding: 22px 24px;
+    position: relative;
+  }
+  /* Mustard ochre — general inquiries */
+  footer.foot .contact-block.general {
+    background: #C99A3A;
+    color: #0F0F0F;
+  }
+  /* Terracotta — emergency */
+  footer.foot .contact-block.emergency {
+    background: #B8432B;
+    color: #FFF5E0;
+    border-left: 1px solid var(--ink);
+  }
+  @media (max-width: 720px) {
+    footer.foot .contact-block.emergency { border-left: none; border-top: 1px solid var(--ink); }
+  }
+  footer.foot .contact-block .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 9.5px; font-weight: 600;
+    letter-spacing: 0.24em; text-transform: uppercase;
+    margin-bottom: 10px;
+    opacity: 0.7;
+  }
+  footer.foot .contact-block h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700; font-style: normal;
+    font-size: 18px; line-height: 1.05;
+    letter-spacing: -0.005em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  footer.foot .contact-block .sub {
+    font-family: 'Pretendard', sans-serif;
+    font-size: 11.5px; line-height: 1.55;
+    margin-bottom: 14px;
+    opacity: 0.85;
+  }
+  footer.foot .contact-block .langs {
+    font-family: 'Inter', sans-serif;
+    font-size: 9.5px; font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    margin-bottom: 14px;
+    padding: 4px 8px;
+    background: rgba(255,245,224,0.18);
+    border: 1px solid rgba(255,245,224,0.35);
+    display: inline-block;
+  }
+  footer.foot .contact-block dl {
+    display: grid; gap: 0;
+  }
+  footer.foot .contact-block .row {
+    display: grid; grid-template-columns: 90px 1fr;
+    gap: 10px; padding: 7px 0;
+    border-top: 1px solid rgba(0,0,0,0.15);
+    align-items: baseline;
+  }
+  footer.foot .contact-block.emergency .row {
+    border-top-color: rgba(255,245,224,0.22);
+  }
+  footer.foot .contact-block .row:first-child { border-top: 0; padding-top: 0; }
+  footer.foot .contact-block dt {
+    font-family: 'Inter', sans-serif;
+    font-size: 9.5px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    opacity: 0.75;
+  }
+  footer.foot .contact-block dd {
+    font-family: 'Pretendard', sans-serif;
+    font-size: 12px;
+  }
+  footer.foot .contact-block dd a {
+    color: inherit; text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 1px;
+    transition: opacity 0.15s;
+    word-break: break-all;
+  }
+  footer.foot .contact-block dd a:hover { opacity: 0.65; }
+  footer.foot .contact-block dd.muted {
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    opacity: 0.7;
+  }
+  footer.foot .biz-info {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 28px; align-items: start;
+  }
+  @media (max-width: 720px) {
+    footer.foot .biz-info { grid-template-columns: 1fr; gap: 14px; }
+  }
+  footer.foot .biz-info .brand-mark {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600; font-size: 12px;
+    letter-spacing: 0.28em; color: var(--ink-deep);
+  }
+  footer.foot .biz-info .biz-lines {
+    font-family: 'Pretendard', sans-serif;
+    font-size: 12px; color: var(--ink-soft);
+    line-height: 1.7;
+  }
+  footer.foot .biz-info .biz-lines strong {
+    color: var(--ink); font-weight: 500;
+  }
+  footer.foot .copyright {
+    margin-top: 24px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 11.5px;
+    color: var(--ink-soft); letter-spacing: 0.04em;
+    text-align: center;
+  }
+
+  @media (max-width: 720px) {
+    .intro h1 { font-size: 32px; }
+    header.masthead { grid-template-columns: 1fr auto; gap: 12px; padding: 12px 18px; }
+    header.masthead .lang { grid-column: 1 / -1; justify-content: center; }
+    header.masthead .right { display: none; }
+    .region-label text.name { font-size: 12px; }
+    .region-label text.name-en { display: none; }
+    .hint .step { display: block; margin: 4px 0; }
+    .region-stats { gap: 26px; flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="left">
+    <div class="logo">LOCALBOOST</div>
+    <div class="tag">— jeju · for travelers</div>
+  </div>
+  <div class="lang" role="tablist">
+    <button class="active" data-lang="ko">한</button>
+    <button data-lang="en">EN</button>
+    <button data-lang="zh">中</button>
+  </div>
+  <div class="right">on the <strong>Google Play</strong> · 2026</div>
+</header>
+
+<section class="intro">
+  <h1>
+    <span class="title-row">
+      <span>Localboost Jeju</span>
+      <svg class="mini-jeju" viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- 제주 본섬 외곽 -->
+        <path d="M 10,38 C 14,28 28,18 50,15 C 70,12 92,16 108,24 C 116,30 117,40 110,48 C 100,57 78,60 56,58 C 36,57 18,52 12,46 C 9,43 9,40 10,38 Z"/>
+        <!-- 한라산 -->
+        <path class="peak" d="M 50,36 L 58,26 L 64,22 L 70,28 L 78,36"/>
+        <!-- 정상점 -->
+        <path class="peak" d="M 63,24 L 65,24"/>
+      </svg>
+    </span>
+  </h1>
+</section>
+
+<div class="stage">
+  <div class="map-frame">
+    <svg id="jejuMap" class="jeju-svg" viewBox="0 0 1200 700" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="rough" x="-2%" y="-2%" width="104%" height="104%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.025" numOctaves="2" seed="3"/>
+          <feDisplacementMap in="SourceGraphic" scale="2.5"/>
+        </filter>
+        <filter id="rougher">
+          <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="7"/>
+          <feDisplacementMap in="SourceGraphic" scale="3"/>
+        </filter>
+      </defs>
+
+      <g class="underdraw" filter="url(#rougher)">
+        <path class="draw-path faint" style="--len:3500" d="M 95,330 C 110,260 200,205 320,195 C 440,185 540,200 640,188 C 740,178 840,195 940,225 C 1040,255 1095,295 1095,335 C 1095,380 1015,425 905,448 C 795,470 670,478 540,475 C 410,470 295,455 200,430 C 130,408 100,375 95,330 Z"/>
+      </g>
+      <g class="coastline" filter="url(#rough)">
+        <path id="mainCoast" class="draw-path main" style="--len:4200" d="M 95,335 C 100,290 130,235 200,205 C 270,180 340,180 410,180 C 470,180 510,195 565,185 C 620,176 680,170 740,180 C 810,192 880,210 950,235 C 1020,260 1080,290 1100,330 C 1110,360 1095,395 1050,425 C 1000,455 920,475 820,485 C 720,495 605,495 510,490 C 410,485 320,470 245,445 C 175,420 130,395 105,365 C 95,350 90,342 95,335 Z"/>
+      </g>
+      <g class="retrace" filter="url(#rougher)">
+        <path class="draw-path detail" style="--len:1400; stroke-width:0.9; opacity:0.5" d="M 200,205 C 320,195 440,185 565,185 C 680,170 810,192 950,235"/>
+        <path class="draw-path detail" style="--len:1400; stroke-width:0.9; opacity:0.5" d="M 1050,425 C 920,470 705,492 510,490 C 320,470 175,420 105,365"/>
+      </g>
+      <g class="mountain" filter="url(#rough)">
+        <path class="draw-path detail" style="--len:240" d="M 555,360 L 585,305 L 605,278 L 628,310 L 660,360"/>
+        <path class="draw-path detail" style="--len:120; stroke-width:0.9" d="M 585,325 L 605,295 L 625,325"/>
+        <path class="draw-path detail" style="--len:60; stroke-width:0.8" d="M 600,290 L 612,290"/>
+      </g>
+      <g class="boundaries" filter="url(#rough)">
+        <path class="draw-path" style="--len:90; stroke:var(--ink-mid); stroke-width:0.9; opacity:0.55" d="M 155,270 L 240,290"/>
+        <path class="draw-path" style="--len:80; stroke:var(--ink-mid); stroke-width:0.9; opacity:0.55" d="M 290,215 L 335,272"/>
+        <path class="draw-path" style="--len:70; stroke:var(--ink-mid); stroke-width:0.9; opacity:0.55" d="M 470,195 L 455,265"/>
+        <path class="draw-path" style="--len:90; stroke:var(--ink-mid); stroke-width:0.9; opacity:0.55" d="M 650,178 L 600,255"/>
+        <path class="draw-path" style="--len:90; stroke:var(--ink-mid); stroke-width:0.9; opacity:0.55" d="M 790,192 L 745,275"/>
+        <path class="draw-path" style="--len:230; stroke:var(--ink-mid); stroke-width:0.9; opacity:0.55" d="M 1080,290 L 870,335"/>
+        <path class="draw-path" style="--len:200; stroke:var(--ink-mid); stroke-width:0.9; opacity:0.55" d="M 1050,425 L 870,400"/>
+        <path class="draw-path" style="--len:90; stroke:var(--ink-mid); stroke-width:0.9; opacity:0.55" d="M 790,485 L 730,420"/>
+        <path class="draw-path" style="--len:80; stroke:var(--ink-mid); stroke-width:0.9; opacity:0.55" d="M 610,492 L 595,432"/>
+        <path class="draw-path" style="--len:60; stroke:var(--ink-mid); stroke-width:0.9; opacity:0.55" d="M 470,485 L 470,433"/>
+        <path class="draw-path" style="--len:80; stroke:var(--ink-mid); stroke-width:0.9; opacity:0.55" d="M 310,472 L 360,415"/>
+        <path class="draw-path" style="--len:90; stroke:var(--ink-mid); stroke-width:0.9; opacity:0.55" d="M 180,460 L 260,410"/>
+        <path class="draw-path" style="--len:80; stroke:var(--ink-mid); stroke-width:0.9; opacity:0.55" d="M 130,380 L 215,365"/>
+      </g>
+      <g class="hatch">
+        <path class="draw-path shade" style="--len:60" d="M 220,455 L 240,470"/>
+        <path class="draw-path shade" style="--len:60" d="M 250,460 L 270,475"/>
+        <path class="draw-path shade" style="--len:60" d="M 360,475 L 380,490"/>
+        <path class="draw-path shade" style="--len:60" d="M 700,485 L 720,500"/>
+        <path class="draw-path shade" style="--len:60" d="M 830,478 L 850,493"/>
+      </g>
+      <g class="waves">
+        <path class="draw-path shade" style="--len:780" d="M 200,580 q 30,-7 60,0 t 60,0 t 60,0 t 60,0 t 60,0 t 60,0 t 60,0 t 60,0 t 60,0 t 60,0 t 60,0 t 60,0"/>
+        <path class="draw-path shade" style="--len:680" d="M 260,610 q 30,-7 60,0 t 60,0 t 60,0 t 60,0 t 60,0 t 60,0 t 60,0 t 60,0 t 60,0 t 60,0"/>
+        <path class="draw-path shade" style="--len:540" d="M 320,635 q 30,-6 60,0 t 60,0 t 60,0 t 60,0 t 60,0 t 60,0 t 60,0 t 60,0"/>
+      </g>
+      <g class="airport-grp" filter="url(#rough)" transform="translate(545,225)">
+        <g transform="rotate(-22)">
+          <path class="draw-path detail" style="--len:140; stroke-width:1.3" d="M 0,-15 L -2,-7 L -16,-1 L -16,2 L -3,1 L -3,7 L -8,10 L -8,12 L -2,11 L 0,14 L 2,11 L 8,12 L 8,10 L 3,7 L 3,1 L 16,2 L 16,-1 L 2,-7 Z"/>
+        </g>
+        <path class="draw-path thin" style="--len:24; stroke-dasharray:3 3" d="M -34,16 L -16,12"/>
+        <path class="draw-path thin" style="--len:18" d="M 18,-14 L 30,-22"/>
+      </g>
+      <g class="airport-label-grp">
+        <text class="ko" x="610" y="220" text-anchor="start">제주공항</text>
+        <text class="en" x="610" y="234" text-anchor="start">JEJU AIRPORT</text>
+      </g>
+      <g class="deco">
+        <!-- Compass (minimal black on white) -->
+        <g transform="translate(1090,610)">
+          <path class="draw-path thin" style="--len:130" d="M 0,-22 L 0,22 M -22,0 L 22,0"/>
+          <path class="draw-path thin" style="--len:90" d="M 0,-22 L -4,-2 L 0,2 L 4,-2 Z"/>
+          <text x="0" y="-30" text-anchor="middle" font-family="Inter" font-size="10" font-weight="500" fill="var(--ink-soft)" letter-spacing="2">N</text>
+        </g>
+      </g>
+
+      <g id="regionAreas">
+        <path class="region-area" data-region="hangyeong"  d="M 600,360 L 130,380 L 110,360 L 95,335 L 105,295 L 155,270 Z"/>
+        <path class="region-area" data-region="hallim"     d="M 600,360 L 155,270 L 200,240 L 290,215 Z"/>
+        <path class="region-area" data-region="aewol"      d="M 600,360 L 290,215 L 380,195 L 470,195 Z"/>
+        <path class="region-area" data-region="jeju-si"    d="M 600,360 L 470,195 L 565,188 L 650,178 Z"/>
+        <path class="region-area" data-region="jocheon"    d="M 600,360 L 650,178 L 740,180 L 790,192 Z"/>
+        <path class="region-area" data-region="gujwa"      d="M 600,360 L 790,192 L 880,215 L 950,235 L 1080,290 Z"/>
+        <path class="region-area" data-region="seongsan"   d="M 600,360 L 1080,290 L 1100,330 L 1095,395 L 1050,425 Z"/>
+        <path class="region-area" data-region="pyoseon"    d="M 600,360 L 1050,425 L 920,475 L 790,485 Z"/>
+        <path class="region-area" data-region="namwon"     d="M 600,360 L 790,485 L 700,490 L 610,492 Z"/>
+        <path class="region-area" data-region="seogwipo"   d="M 600,360 L 610,492 L 510,488 L 470,485 Z"/>
+        <path class="region-area" data-region="jungmun"    d="M 600,360 L 470,485 L 390,478 L 310,472 Z"/>
+        <path class="region-area" data-region="andeok"     d="M 600,360 L 310,472 L 245,465 L 180,460 Z"/>
+        <path class="region-area" data-region="daejeong"   d="M 600,360 L 180,460 L 155,425 L 130,380 Z"/>
+      </g>
+      <g id="journey"></g>
+
+      <g id="regionLabels">
+        <g class="region-label" data-region="hangyeong" transform="translate(195,330)"><text class="name" text-anchor="middle" y="0">한경면</text><text class="name-en" text-anchor="middle" y="13">Hangyeong</text></g>
+        <g class="region-label" data-region="hallim" transform="translate(255,265)"><text class="name" text-anchor="middle" y="0">한림읍</text><text class="name-en" text-anchor="middle" y="13">Hallim</text></g>
+        <g class="region-label" data-region="aewol" transform="translate(380,238)"><text class="name" text-anchor="middle" y="0">애월읍</text><text class="name-en" text-anchor="middle" y="13">Aewol</text></g>
+        <g class="region-label" data-region="jeju-si" transform="translate(530,235)"><text class="name" text-anchor="middle" y="0">제주시</text><text class="name-en" text-anchor="middle" y="13">Jeju City</text></g>
+        <g class="region-label" data-region="jocheon" transform="translate(660,225)"><text class="name" text-anchor="middle" y="0">조천읍</text><text class="name-en" text-anchor="middle" y="13">Jocheon</text></g>
+        <g class="region-label" data-region="gujwa" transform="translate(845,255)"><text class="name" text-anchor="middle" y="0">구좌읍</text><text class="name-en" text-anchor="middle" y="13">Gujwa</text></g>
+        <g class="region-label" data-region="seongsan" transform="translate(985,360)"><text class="name" text-anchor="middle" y="0">성산읍</text><text class="name-en" text-anchor="middle" y="13">Seongsan</text></g>
+        <g class="region-label" data-region="pyoseon" transform="translate(835,430)"><text class="name" text-anchor="middle" y="0">표선면</text><text class="name-en" text-anchor="middle" y="13">Pyoseon</text></g>
+        <g class="region-label" data-region="namwon" transform="translate(680,455)"><text class="name" text-anchor="middle" y="0">남원읍</text><text class="name-en" text-anchor="middle" y="13">Namwon</text></g>
+        <g class="region-label" data-region="seogwipo" transform="translate(540,468)"><text class="name" text-anchor="middle" y="0">서귀포</text><text class="name-en" text-anchor="middle" y="13">Seogwipo</text></g>
+        <g class="region-label" data-region="jungmun" transform="translate(415,452)"><text class="name" text-anchor="middle" y="0">중문</text><text class="name-en" text-anchor="middle" y="13">Jungmun</text></g>
+        <g class="region-label" data-region="andeok" transform="translate(305,432)"><text class="name" text-anchor="middle" y="0">안덕면</text><text class="name-en" text-anchor="middle" y="13">Andeok</text></g>
+        <g class="region-label" data-region="daejeong" transform="translate(195,425)"><text class="name" text-anchor="middle" y="0">대정읍</text><text class="name-en" text-anchor="middle" y="13">Daejeong</text></g>
+      </g>
+
+      <g class="pencil-cursor" id="pencilCursor">
+        <g>
+          <path d="M -2,2 L 12,-12 L 16,-8 L 2,6 Z" fill="#1F4F36"/>
+          <path d="M 12,-12 L 16,-16 L 20,-12 L 16,-8 Z" fill="#B8432B"/>
+          <path d="M -2,2 L 0,8 L 4,4 Z" fill="#1F4F36"/>
+        </g>
+      </g>
+      <g id="journeyPencil" style="opacity:0; pointer-events:none;">
+        <path d="M -2,2 L 12,-12 L 16,-8 L 2,6 Z" fill="#B8432B"/>
+        <path d="M 12,-12 L 16,-16 L 20,-12 L 16,-8 Z" fill="#1F4F36"/>
+        <path d="M -2,2 L 0,8 L 4,4 Z" fill="#B8432B"/>
+      </g>
+    </svg>
+    <button class="replay" id="replayBtn">↻ 다시 그리기</button>
+  </div>
+
+  <p class="map-hint" data-i18n="mapHint">지도를 누르세요!</p>
+
+  <aside class="biz-panel" id="bizPanel" aria-hidden="true">
+    <header>
+      <button class="panel-back" id="panelBack">← <span id="panelBackLabel">권역</span></button>
+      <div class="panel-top-row">
+        <div>
+          <div class="panel-meta" id="panelMeta">— Region</div>
+          <h2 id="panelTitle">제주<small id="panelEn">Jeju</small></h2>
+        </div>
+        <button class="panel-close" id="panelClose" aria-label="닫기">×</button>
+      </div>
+    </header>
+    <div class="panel-body" id="panelBody"></div>
+  </aside>
+
+  <p class="hint">
+    <span class="step"><span class="num">1</span><span data-i18n="hint1">권역 가리키기</span></span>
+    <span class="step"><span class="num">2</span><span data-i18n="hint2">카테고리 (숙소·음식·카페)</span></span>
+    <span class="step"><span class="num">3</span><span data-i18n="hint3">가게 선택</span></span>
+  </p>
+
+  <div class="region-stats">
+    <div class="stat"><strong id="statRegions">13</strong><span id="statRegionsLabel">개 권역 · regions</span></div>
+    <div class="stat"><strong id="statBiz">19</strong><span id="statBizLabel">개 가게 · places</span></div>
+    <div class="stat"><strong>3</strong><span id="statLangsLabel">개 언어 · languages</span></div>
+  </div>
+</div>
+
+<div class="modal-back" id="modalBack" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="modal-close" id="modalClose" aria-label="닫기">×</button>
+    <div class="modal-head">
+      <div class="cat" id="modalCat">— Category</div>
+      <h2 id="modalTitle">제목</h2>
+      <div class="place-line" id="modalPlace">place</div>
+      <div class="journey-meta" id="modalJourney"><span>✈</span><span><span data-i18n="fromAirport">공항에서 약</span> <strong id="modalDist">—</strong> · <span id="modalDir">—</span></span></div>
+    </div>
+
+    <!-- Photo slideshow -->
+    <div class="slideshow">
+      <div class="slides" id="slides">
+        <div class="slide" data-tone="1">
+          <div class="slide-icon" id="slideIcon1"></div>
+        </div>
+        <div class="slide" data-tone="2">
+          <div class="slide-icon" id="slideIcon2"></div>
+        </div>
+        <div class="slide" data-tone="3">
+          <div class="slide-icon" id="slideIcon3"></div>
+        </div>
+      </div>
+      <button class="slide-arrow slide-prev" id="slidePrev" aria-label="이전">‹</button>
+      <button class="slide-arrow slide-next" id="slideNext" aria-label="다음">›</button>
+      <div class="slide-dots" id="slideDots">
+        <span class="slide-dot active" data-idx="0"></span>
+        <span class="slide-dot" data-idx="1"></span>
+        <span class="slide-dot" data-idx="2"></span>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="rating-row">
+        <div class="stars" id="modalStars">★★★★☆</div>
+        <div class="rating-num"><strong id="modalRating">—</strong><small> / 5.0</small></div>
+        <div class="rating-count" id="modalReviews">— reviews</div>
+      </div>
+
+      <p class="desc" id="modalDesc"></p>
+
+      <div class="highlights">
+        <h3 data-i18n="highlights">특장점 · highlights</h3>
+        <ul id="modalHighlights"></ul>
+      </div>
+
+      <dl>
+        <dt data-i18n="hours">운영</dt><dd id="modalHours">—</dd>
+        <dt data-i18n="location">위치</dt><dd id="modalAddr">—</dd>
+        <dt data-i18n="contact">문의</dt><dd id="modalContact">—</dd>
+      </dl>
+
+      <div class="channel-buttons" id="modalChannels"></div>
+      <div class="return-note" data-i18n="openNote">
+        새 창으로 열려요. 원래 페이지(LOCALBOOST)는 그대로 남아 있습니다.
+      </div>
+      <div class="read-only-note" data-i18n="readOnly">
+        본 페이지는 정보 열람 전용입니다 — 후기·문의는 받지 않습니다.
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="foot">
+
+  <div class="contact-grid">
+
+    <!-- General inquiries -->
+    <div class="contact-block general">
+      <div class="label" data-i18n="contactLabel">— Contact · 문의</div>
+      <h3 data-i18n="contactTitle">General Inquiries</h3>
+      <p class="sub" data-i18n="contactSub">파트너십·입점·서비스 일반 문의</p>
+      <dl>
+        <div class="row">
+          <dt>KakaoTalk</dt>
+          <dd><a href="https://open.kakao.com/o/s6gd7Kui" target="_blank" rel="noopener">open.kakao.com/o/s6gd7Kui</a></dd>
+        </div>
+        <div class="row">
+          <dt>WeChat</dt>
+          <dd class="muted" data-i18n="comingSoon">coming soon</dd>
+        </div>
+        <div class="row">
+          <dt>Email</dt>
+          <dd><a href="mailto:ian0417kim@gmail.com">ian0417kim@gmail.com</a></dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Tourist emergency -->
+    <div class="contact-block emergency">
+      <div class="label" data-i18n="emergencyLabel">— Tourist Emergency · 관광객 긴급</div>
+      <h3 data-i18n="emergencyTitle">For travelers in distress</h3>
+      <p class="sub" data-i18n="emergencySub">위급 상황에 한해 — 일반 문의는 위 채널로 부탁드립니다</p>
+      <div class="langs" data-i18n="emergencyLangs">KO · EN only</div>
+      <dl>
+        <div class="row">
+          <dt>KakaoTalk</dt>
+          <dd><a href="https://open.kakao.com/o/s6gd7Kui" target="_blank" rel="noopener">open.kakao.com/o/s6gd7Kui</a></dd>
+        </div>
+        <div class="row">
+          <dt>WeChat</dt>
+          <dd class="muted" data-i18n="comingSoon">coming soon</dd>
+        </div>
+        <div class="row">
+          <dt>Email</dt>
+          <dd><a href="mailto:ian0417kim@gmail.com">ian0417kim@gmail.com</a></dd>
+        </div>
+      </dl>
+    </div>
+
+  </div>
+
+  <div class="biz-info">
+    <div class="brand-mark">LOCALBOOST</div>
+    <div class="biz-lines">
+      <strong>제주특별자치도 제주시 달마루길 18, 2층 4-10호</strong><br/>
+      사업자등록번호 721-03-03478 · 대표 김세희 · 010-8069-8849
+    </div>
+  </div>
+
+  <div class="copyright">© 2026 LOCALBOOST · curated by hand · jeju</div>
+
+</footer>
+
+<script>
+  // ============================================================================
+  //   ┌──────────────────────────────────────────────────────────────────────┐
+  //   │   LOCALBOOST DATA — 데이터 영역 (이 블록만 수정하세요)               │
+  //   └──────────────────────────────────────────────────────────────────────┘
+  //
+  //   가게 추가/수정/삭제는 모두 아래 BUSINESSES 배열에서 처리됩니다.
+  //   다른 코드는 건드리지 마세요. 새로고침하면 지도와 패널에 자동 반영됩니다.
+  //
+  //   향후 백엔드 연결 시: BUSINESSES 배열만 fetch('/api/businesses')로 교체.
+  //
+  //   ▣ 본 앱은 정보 열람 전용입니다. 후기/문의 입력 폼은 의도적으로 두지 않습니다.
+  //
+  // ============================================================================
+
+  // ── 1. 카테고리 (3개) — 한/영/중 ─────────────────────────────────────────
+  const CATEGORIES = {
+    stay: {
+      ko: '숙소', en: 'Stay', zh: '住宿',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 3,12 L 12,4 L 21,12 L 21,20 L 3,20 Z"/><path d="M 9,20 L 9,14 L 15,14 L 15,20"/></svg>'
+    },
+    food: {
+      ko: '음식', en: 'Food', zh: '美食',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 3,11 L 21,11 Q 21,20 12,20 Q 3,20 3,11 Z"/><path d="M 7,7 Q 12,3 17,7"/></svg>'
+    },
+    cafe: {
+      ko: '카페', en: 'Cafe', zh: '咖啡',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 5,8 L 17,8 L 17,16 Q 17,20 12,20 Q 7,20 7,16 L 7,8 Z"/><path d="M 17,10 Q 21,10 21,13 Q 21,16 17,16"/><path d="M 9,3 L 9,5 M 12,3 L 12,5 M 15,3 L 15,5"/></svg>'
+    },
+    realty: {
+      ko: '부동산', en: 'Real Estate', zh: '房产',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 3,11 L 12,3 L 21,11 L 21,21 L 3,21 Z"/><path d="M 9,21 L 9,13 L 15,13 L 15,21"/><circle cx="13" cy="17" r="0.6" fill="currentColor"/></svg>'
+    }
+  };
+
+  // ── 2. 권역 (13개) — 한/영/중 ───────────────────────────────────────────
+  const REGIONS = {
+    hangyeong: { ko:'한경면', en:'Hangyeong', zh:'翰京面', sub:{ko:'서쪽 끝 — 차귀도·신창', en:'Western tip — Chagwido', zh:'西端 — 遮归岛'}, panelSide:'right', panelVert:'bottom' },
+    hallim:    { ko:'한림읍', en:'Hallim',    zh:'翰林邑', sub:{ko:'협재·금능·비양도', en:'Hyeopjae · Geumneung', zh:'狭才·琴陵·飞扬岛'}, panelSide:'right', panelVert:'bottom' },
+    aewol:     { ko:'애월읍', en:'Aewol',     zh:'涯月邑', sub:{ko:'곽지·한담·애월리', en:'Gwakji · Handam', zh:'郭支·汉潭·涯月里'}, panelSide:'right', panelVert:'bottom' },
+    'jeju-si': { ko:'제주시', en:'Jeju City', zh:'济州市', sub:{ko:'동(洞) — 일도·삼도·노형', en:'Downtown — Ildo, Samdo, Nohyeong', zh:'市中心 — 一徒、三徒、老衡'}, panelSide:'right', panelVert:'bottom' },
+    jocheon:   { ko:'조천읍', en:'Jocheon',   zh:'朝天邑', sub:{ko:'함덕·조천·교래', en:'Hamdeok · Jocheon · Gyorae', zh:'咸德·朝天·桥来'}, panelSide:'left',  panelVert:'bottom' },
+    gujwa:     { ko:'구좌읍', en:'Gujwa',     zh:'旧左邑', sub:{ko:'김녕·월정·평대·세화', en:'Gimnyeong · Woljeong · Sehwa', zh:'金宁·月汀·细花'}, panelSide:'left',  panelVert:'bottom' },
+    seongsan:  { ko:'성산읍', en:'Seongsan',  zh:'城山邑', sub:{ko:'일출봉·성산·우도', en:'Ilchulbong · Udo', zh:'日出峰·城山·牛岛'}, panelSide:'left',  panelVert:'bottom' },
+    pyoseon:   { ko:'표선면', en:'Pyoseon',   zh:'表善面', sub:{ko:'표선·가시리', en:'Pyoseon · Gasiri', zh:'表善·加时里'}, panelSide:'left',  panelVert:'top' },
+    namwon:    { ko:'남원읍', en:'Namwon',    zh:'南元邑', sub:{ko:'위미·태흥·큰엉', en:'Wimi · Taeheung · Keuneong', zh:'为美·泰兴·큰엉'}, panelSide:'left',  panelVert:'top' },
+    seogwipo:  { ko:'서귀포', en:'Seogwipo',  zh:'西归浦', sub:{ko:'동(洞) — 정방·서귀·천지', en:'Downtown — Jeongbang, Seogwi', zh:'市中心 — 正房·西归·天地'}, panelSide:'right', panelVert:'top' },
+    jungmun:   { ko:'중문',   en:'Jungmun',   zh:'中文',   sub:{ko:'중문관광단지·천제연', en:'Jungmun Resort · Cheonjeyeon', zh:'中文旅游区·天帝渊'}, panelSide:'right', panelVert:'top' },
+    andeok:    { ko:'안덕면', en:'Andeok',    zh:'安德面', sub:{ko:'사계·산방산·안덕계곡', en:'Sagye · Sanbangsan · Andeok Valley', zh:'沙溪·山房山·安德溪谷'}, panelSide:'right', panelVert:'top' },
+    daejeong:  { ko:'대정읍', en:'Daejeong',  zh:'大静邑', sub:{ko:'모슬포·송악산·가파도', en:'Moseulpo · Songaksan · Gapado', zh:'摹瑟浦·松岳山·加波岛'}, panelSide:'right', panelVert:'top' }
+  };
+
+  // ── UI labels — 한/영/중 ───────────────────────────────────────────────
+  const UI_LANG = {
+    vol: {
+      ko: 'a hand-drawn map of jeju',
+      en: 'a hand-drawn map of jeju',
+      zh: 'a hand-drawn map of jeju'
+    },
+    mapHint: {
+      ko: '지도를 누르세요!',
+      en: 'Tap the map!',
+      zh: '点击地图!'
+    },
+    lede: {
+      ko: '제주의 13개 동네, 그 안의 작은 가게들. 권역을 가리키고 카테고리를 고르세요.',
+      en: "13 neighborhoods of Jeju, and the small places within. Point to a region, pick a category.",
+      zh: '济州的13个地区，里面的小店。指向一个地区,选择类别。'
+    },
+    hint1: {
+      ko: '권역 가리키기',
+      en: 'Point to a region',
+      zh: '选择地区'
+    },
+    hint2: {
+      ko: '카테고리 (숙소·음식·카페)',
+      en: 'Pick category (Stay·Food·Cafe)',
+      zh: '选择类别 (住宿·美食·咖啡)'
+    },
+    hint3: {
+      ko: '가게 선택',
+      en: 'Choose a shop',
+      zh: '选择店铺'
+    },
+    statRegions: {
+      ko: '개 권역 · regions',
+      en: 'regions',
+      zh: '个地区 · regions'
+    },
+    statBiz: {
+      ko: '개 가게 · places',
+      en: 'places',
+      zh: '家店铺 · places'
+    },
+    statLangs: {
+      ko: '개 언어 · languages',
+      en: 'languages',
+      zh: '种语言 · languages'
+    },
+    pickCategory: {
+      ko: '카테고리를 선택하세요',
+      en: 'Pick a category',
+      zh: '请选择类别'
+    },
+    placesCountSuffix: {
+      ko: '곳',
+      en: '',
+      zh: '家'
+    },
+    emptySoon: {
+      ko: '곧 합류해요',
+      en: 'Coming soon',
+      zh: '即将加入'
+    },
+    emptyDesc: {
+      ko: '이 권역의 가게는 아직 큐레이션 중이에요.',
+      en: 'Shops in this region are still being curated.',
+      zh: '该地区的店铺还在筛选中。'
+    },
+    backToCategory: {
+      ko: '· 카테고리 다시 고르기',
+      en: '· Pick another category',
+      zh: '· 重新选择类别'
+    },
+    hours: { ko: '운영', en: 'Hours', zh: '营业' },
+    location: { ko: '위치', en: 'Location', zh: '位置' },
+    contact: { ko: '문의', en: 'Contact', zh: '联系' },
+    viewDetails: { ko: '자세히 보기', en: 'View details', zh: '查看详情' },
+    fromAirport: { ko: '공항에서 약', en: 'from airport approx.', zh: '从机场约' },
+    direction: {
+      ko: { '동쪽':'동쪽','서쪽':'서쪽','남쪽':'남쪽','북쪽':'북쪽','북동쪽':'북동쪽','북서쪽':'북서쪽','남동쪽':'남동쪽','남서쪽':'남서쪽' },
+      en: { '동쪽':'east','서쪽':'west','남쪽':'south','북쪽':'north','북동쪽':'northeast','북서쪽':'northwest','남동쪽':'southeast','남서쪽':'southwest' },
+      zh: { '동쪽':'东','서쪽':'西','남쪽':'南','북쪽':'北','북동쪽':'东北','북서쪽':'西北','남동쪽':'东南','남서쪽':'西南' }
+    },
+    reviews: { ko: '리뷰', en: 'reviews', zh: '评价' },
+    highlights: { ko: '특장점 · highlights', en: 'highlights · 특장점', zh: '亮点 · highlights' },
+    readOnly: {
+      ko: '본 페이지는 정보 열람 전용입니다 — 후기·문의는 받지 않습니다.',
+      en: 'This page is for browsing only — no reviews or inquiries are accepted.',
+      zh: '本页面仅供浏览 — 不接收评论或咨询。'
+    },
+    openNote: {
+      ko: '새 창으로 열려요. 원래 페이지(LOCALBOOST)는 그대로 남아 있습니다.',
+      en: 'Opens in a new window. The LOCALBOOST page stays open.',
+      zh: '在新窗口中打开。LOCALBOOST页面保持打开。'
+    },
+    contactLabel: {
+      ko: '— 문의 · Contact',
+      en: '— Contact · 문의',
+      zh: '— 联系 · Contact'
+    },
+    contactSub: {
+      ko: '파트너십 · 입점 · 서비스 일반 문의',
+      en: 'Partnership · Listing · General inquiries',
+      zh: '合作 · 入驻 · 一般咨询'
+    },
+    emergencyLabel: {
+      ko: '— 관광객 긴급 · Tourist Emergency',
+      en: '— Tourist Emergency · 관광객 긴급',
+      zh: '— 游客紧急 · Tourist Emergency'
+    },
+    emergencySub: {
+      ko: '위급 상황에 한해 — 일반 문의는 위 채널로 부탁드립니다',
+      en: 'Emergencies only — please use channels above for general inquiries',
+      zh: '仅限紧急情况 — 一般咨询请使用上方渠道'
+    },
+    comingSoon: {
+      ko: '준비 중',
+      en: 'coming soon',
+      zh: '即将开通'
+    },
+    contactTitle: {
+      ko: '일반 문의',
+      en: 'General Inquiries',
+      zh: '一般咨询'
+    },
+    emergencyTitle: {
+      ko: '여행자 위급 상황',
+      en: 'Travelers in distress',
+      zh: '游客紧急情况'
+    },
+    emergencyLangs: {
+      ko: '한국어 · 영어만',
+      en: 'KO · EN only',
+      zh: '仅韩语·英语'
+    }
+  };
+
+  let currentLang = 'ko';
+  function t(key) {
+    const entry = UI_LANG[key];
+    if (!entry) return '';
+    return entry[currentLang] || entry.ko || '';
+  }
+
+  // ── 3. 가게 목록 ────────────────────────────────────────────────────────
+  //
+  //   ▶ 추가:  아래 객체 한 줄을 복사 → 그 아래 붙여넣기 → 값만 수정
+  //   ▶ 삭제:  해당 객체 한 덩어리 ({ ... }) 통째로 지우기
+  //   ▶ 수정:  해당 객체 안의 값만 변경
+  //
+  //   필수 필드:
+  //     id          : 고유 ID (영문/숫자)
+  //     region      : 권역 코드 (REGIONS의 키)
+  //     category    : 카테고리 코드 (stay / food / cafe)
+  //     name        : 가게 이름
+  //     place       : 약식 위치 (영문 권장)
+  //     x, y        : 지도 좌표 (viewBox 1200×700)
+  //     desc        : 한 줄 소개 (1~3문장)
+  //     rating      : 별점 (0.0 ~ 5.0)
+  //     reviewCount : 리뷰 수 (정수)
+  //     highlights  : 특장점 배열 (3~5개 권장)
+  //     hours       : 운영 시간
+  //     addr        : 상세 주소
+  //     contact     : 연락처
+  //     url         : 외부 사이트 (자세히 보기 버튼)
+  //     photos      : (선택) 실제 사진 URL 배열. 비워두면 플레이스홀더 슬라이드.
+  //
+  const BUSINESSES = [
+
+    // ── 한림읍 — 화양연화 ──
+    { id:'hl1', region:'hallim', category:'stay',
+      name:{ ko:'화양연화', en:'In the Mood for Love', zh:'花样年华' },
+      place:'hallim, 협재리',
+      x:210, y:288,
+      desc:{
+        ko:'협재 프라이빗 감성 힐링 숙소. 지금 이 순간, 당신을 위한 가장 빛나는 휴식처.',
+        en:'A private healing stay in Hyeopjae. The brightest sanctuary for this very moment.',
+        zh:'挾才私人疗愈住宿。属于此刻、属于你的最闪耀的休息处。'
+      },
+      status:'new', rating:null, reviewCount:null,
+      highlights:{
+        ko:['프라이빗 자쿠지','실내 감성 불멍존','프라이빗 노래방'],
+        en:['Private jacuzzi','Indoor fire lounge','Private karaoke'],
+        zh:['私人浴缸','室内壁炉空间','私人卡拉OK']
+      },
+      hours:{ko:'연중무휴 · 체크인 15:00 / 체크아웃 11:00', en:'Open year-round · Check-in 15:00 / Check-out 11:00', zh:'全年无休 · 入住 15:00 / 退房 11:00'},
+      addr:{ko:'제주시 한림읍 협재로 151-126', en:'151-126 Hyeopjae-ro, Hallim-eup, Jeju', zh:'济州市翰林邑狭才路 151-126'},
+      contact:'0507-1302-5005',
+      channels:{
+        blog:'https://blog.naver.com/inthemoodforlovejeju',
+        instagram:'https://www.instagram.com/inthemoodforlove_jeju/'
+      },
+      photos:[
+        '업체폴더/화양연화(숙소)/h1.png',
+        '업체폴더/화양연화(숙소)/h2.png',
+        '업체폴더/화양연화(숙소)/h3.png'
+      ] },
+
+    // ── 조천읍 — 돌담연가 ──
+    { id:'jc1', region:'jocheon', category:'stay',
+      name:{ ko:'돌담연가', en:'Doldam Yeonga', zh:'石垣戀歌' },
+      place:'jocheon, 조와로',
+      x:680, y:218,
+      desc:{
+        ko:'사계절 정원과 자쿠지가 있는 제주 감성 독채숙소. 약 600평의 너른 정원, 실내 자쿠지, 프라이빗 정원, 바베큐와 불멍.',
+        en:'A Jeju private stay with a four-season garden and indoor jacuzzi. ~600-pyeong garden, BBQ and fire pit.',
+        zh:'拥有四季花园和浴缸的济州私人独栋住宿。约600坪庭院、室内浴缸、烧烤与篝火。'
+      },
+      rating:4.0, reviewCount:0,
+      highlights:{
+        ko:['약 600평의 넓은 정원','가족 여행에 적합한 독채','실내 자쿠지 · 바베큐 · 불멍'],
+        en:['~600-pyeong garden','Private villa for family stays','Indoor jacuzzi · BBQ · fire pit'],
+        zh:['约600坪庭院','适合家庭出行的独栋','室内浴缸·烧烤·篝火']
+      },
+      hours:{ko:'연중무휴 · 체크인 15:00 / 체크아웃 11:00', en:'Open year-round · Check-in 15:00 / Check-out 11:00', zh:'全年无休 · 入住 15:00 / 退房 11:00'},
+      addr:{ko:'제주시 조천읍 조와로5길 45-2', en:'45-2 Jowa-ro 5-gil, Jocheon-eup, Jeju', zh:'济州市朝天邑朝瓦路5街 45-2'},
+      contact:'0507-1354-1716',
+      channels:{
+        blog:'https://blog.naver.com/sookh866422'
+      },
+      photos:[
+        '업체폴더/돌담연가(숙소)/d1.png',
+        '업체폴더/돌담연가(숙소)/d2.png',
+        '업체폴더/돌담연가(숙소)/d3.png'
+      ] },
+
+    // ── 구좌읍 — 해곁 ──
+    { id:'gj1', region:'gujwa', category:'stay',
+      name:{ ko:'해곁', en:'Haegyeot', zh:'海邊' },
+      place:'gujwa, 한동로',
+      x:820, y:220,
+      desc:{
+        ko:'해 곁, 바다와 함께 머무는 온전한 휴식. 시적인 감성과 제주의 자연을 닮은 공간에서 보내는 프라이빗한 시간.',
+        en:'By the sea, complete rest with the ocean as company. A poetic, nature-touched private space.',
+        zh:'海边、与海共眠的完整休息。诗意的、近自然的、专属于你的时光。'
+      },
+      status:'new', rating:null, reviewCount:null,
+      highlights:{
+        ko:['시적인 감성과 결이 살아 있는 공간','제주의 자연을 닮은 소재와 풍경','프라이빗 — 단독 이용'],
+        en:['Poetic, textured spaces','Materials and views echoing Jeju nature','Fully private — no shared guests'],
+        zh:['诗意纹理的空间','呼应济州自然的材质与风景','完全私享 — 单独使用']
+      },
+      hours:{ko:'연중무휴 · 체크인 15:00 / 체크아웃 11:00', en:'Open year-round · Check-in 15:00 / Check-out 11:00', zh:'全年无休 · 入住 15:00 / 退房 11:00'},
+      addr:{ko:'제주시 구좌읍 한동로6길 139', en:'139 Handong-ro 6-gil, Gujwa-eup, Jeju', zh:'济州市旧左邑汉东路6街 139'},
+      contact:'010-5942-0185',
+      channels:{
+        blog:'https://blog.naver.com/haegyeot'
+      },
+      photos:[
+        '업체폴더/해곁(숙소)/hh1.png',
+        '업체폴더/해곁(숙소)/hh2.png',
+        '업체폴더/해곁(숙소)/hh3.png'
+      ] },
+
+    // ── 제주시내 — 태을갈비 ──
+    { id:'js1', region:'jeju-si', category:'food',
+      name:{ ko:'태을갈비', en:'Taeeul Galbi', zh:'太乙烤肉' },
+      place:'jeju-si, 진군중길',
+      x:570, y:215,
+      desc:{
+        ko:'말이 필요 없는 제주 로컬 맛집. 현지인이 찾는 자리.',
+        en:'A true Jeju local favorite — where locals actually go.',
+        zh:'济州本地人推荐的烤肉店,本地人聚集之处。'
+      },
+      localGem:true, rating:null, reviewCount:null,
+      highlights:{
+        ko:['제주 로컬이 찾는 자리','연중무휴 운영','말이 필요 없는 갈비'],
+        en:["Locals' go-to spot",'Open year-round','Galbi that needs no words'],
+        zh:['本地人常来的店','全年无休','无需多言的烤肉']
+      },
+      hours:{ko:'연중무휴 · 매일 11:00~22:00', en:'Open year-round · Daily 11:00–22:00', zh:'全年无休 · 每日 11:00–22:00'},
+      addr:{ko:'제주시 진군중길 12 일심주택', en:'12 Jingunjung-gil, Jeju City', zh:'济州市真军中街 12 一心住宅'},
+      contact:'064-713-9297',
+      channels:{},
+      photos:[
+        '업체폴더/태을갈비(식당)/t1.png',
+        '업체폴더/태을갈비(식당)/t2.png',
+        '업체폴더/태을갈비(식당)/t3.png'
+      ] },
+
+    // ── 제주시내 — 순희뽀글이 ──
+    { id:'js2', region:'jeju-si', category:'food',
+      name:{ ko:'순희뽀글이 정식', en:'Sunhui Bbogeuli', zh:'顺姬家常餐' },
+      place:'jeju-si, 공설로',
+      x:545, y:210,
+      desc:{
+        ko:'착한 가격에 푸짐한 한 상. 말이 필요 없는 제주 로컬 맛집.',
+        en:'Hearty home-style meals at honest prices — a true local favorite.',
+        zh:'实惠的价格、丰盛的家常餐。济州本地人推荐。'
+      },
+      localGem:true, rating:null, reviewCount:null,
+      highlights:{
+        ko:['착한 가격','이른 아침부터 영업 (7시 오픈)','제주 로컬 맛집'],
+        en:['Honest pricing','Opens at 7 AM','Local favorite'],
+        zh:['亲民价格','清晨7点开门','本地人推荐']
+      },
+      hours:{ko:'매일 7:00~16:00 · 일요일 휴무', en:'Daily 7:00–16:00 · Closed Sundays', zh:'每日 7:00–16:00 · 周日休'},
+      addr:{ko:'제주시 공설로 27-1', en:'27-1 Gongseol-ro, Jeju City', zh:'济州市公设路 27-1'},
+      contact:'064-713-9297',
+      channels:{},
+      photos:[
+        '업체폴더/순한뽀글이(식당)/b1.png',
+        '업체폴더/순한뽀글이(식당)/b2.png',
+        '업체폴더/순한뽀글이(식당)/b3.png'
+      ] },
+
+    // ── 안덕면 — 고기편애 ──
+    { id:'ad1', region:'andeok', category:'food',
+      name:{ ko:'고기편애', en:'Gogi Pyeonae', zh:'肉之偏爱' },
+      place:'andeok, 사계리',
+      x:265, y:425,
+      desc:{
+        ko:'좋은 고기에 진심을 담다. 제주 산방산 자락의 고기 전문점.',
+        en:'Sincerity on a plate of fine meat — a specialty house at the foot of Sanbangsan.',
+        zh:'用心对待好肉。济州山房山下的肉类专门店。'
+      },
+      rating:4.5, reviewCount:0,
+      highlights:{
+        ko:['상차림비 0원 / 점심 특선','프리미엄 한우 & 청정 제주 돼지','주차 걱정 없는 쾌적한 공간'],
+        en:['No table charge · lunch specials','Premium Korean beef & clean Jeju pork','Spacious, easy parking'],
+        zh:['免摆盘费/午餐特选','优质韩牛与济州猪肉','宽敞停车便利']
+      },
+      hours:{ko:'매일 11:00~23:00 · 라스트오더 22:00', en:'Daily 11:00–23:00 · Last order 22:00', zh:'每日 11:00–23:00 · 最后点单 22:00'},
+      addr:{ko:'서귀포시 안덕면 사계로114번길 54-58', en:'54-58 Sagye-ro 114beon-gil, Andeok-myeon, Seogwipo', zh:'西归浦市安德面沙溪路114番街 54-58'},
+      contact:'010-9409-3411',
+      channels:{
+        homepage:'https://jeju-no-1.github.io/gogipyeonae/'
+      },
+      photos:[
+        '업체폴더/고기편애(식당)/H6.png',
+        '업체폴더/고기편애(식당)/HA.png',
+        '업체폴더/고기편애(식당)/M3.png'
+      ] },
+
+    // ── 제주시내 — 나라돈까스 (옛날돈까스 맛집) ──
+    { id:'js4', region:'jeju-si', category:'food',
+      name:{ ko:'나라돈까스', en:'Nara Donkatsu', zh:'娜拉炸猪排' },
+      place:'jeju-si, 내도1길',
+      x:510, y:230,
+      desc:{
+        ko:'제주시 1등 돈까스. 옛날 스타일의 두툼한 한 장, 카레와 쫄면 사이드까지 훌륭한 맛집.',
+        en:'Jeju City’s top donkatsu — classic old-style cutlet with excellent curry and jjolmyeon sides.',
+        zh:'济州市第一炸猪排店。复古厚切炸猪排,咖喱和劲面同样出色。'
+      },
+      rating:4.5, reviewCount:0,
+      highlights:{
+        ko:['제주시 1등 돈까스','옛날 돈까스 스타일','카레 · 쫄면 사이드 훌륭'],
+        en:['#1 donkatsu in Jeju City','Old-school style cutlet','Excellent curry & jjolmyeon sides'],
+        zh:['济州市第一炸猪排','复古厚切风味','咖喱与劲面也出色']
+      },
+      hours:{ko:'매일 11:00~20:00', en:'Daily 11:00–20:00', zh:'每日 11:00–20:00'},
+      addr:{ko:'제주시 내도1길 23', en:'23 Naedo 1-gil, Jeju City', zh:'济州市内道1街 23'},
+      contact:'064-711-0221',
+      channels:{},
+      photos:[
+        '업체폴더/나라돈까스(식당)/n1.png',
+        '업체폴더/나라돈까스(식당)/n3.png',
+        '업체폴더/나라돈까스(식당)/n2.png'
+      ] },
+
+    // ── 제주시내 — 로당 (화로구이 안주 주점) ──
+    { id:'js5', region:'jeju-si', category:'food',
+      name:{ ko:'로당', en:'Rodang', zh:'露堂' },
+      place:'jeju-si, 서광로32길',
+      x:555, y:218,
+      desc:{
+        ko:'화로구이로 즐기는 안주 맛집. LA갈비 · 고등어구이 · 꼼장어 · 갈매기살까지, 말이 필요 없는 제주 로컬 주점.',
+        en:'A charcoal-grill anju house — LA galbi, grilled mackerel, eel and pork skirt. A no-fuss local favorite.',
+        zh:'用炭火炉烤的下酒菜专门店。LA牛排骨、烤鲭鱼、烤鳗、横膈肉,济州本地人最爱。'
+      },
+      rating:4.5, reviewCount:0,
+      highlights:{
+        ko:['화로구이 안주 전문','LA갈비 · 고등어 · 꼼장어 · 갈매기살','제대로 된 로컬 주점'],
+        en:['Charcoal-grill anju specialist','LA galbi · mackerel · eel · skirt meat','True local pub'],
+        zh:['炭火炉烤下酒菜专门店','LA牛排骨·鲭鱼·鳗·横膈肉','地道本地小酒馆']
+      },
+      hours:{ko:'매일 17:00~04:00 (매월 둘째·넷째 화요일 휴무)', en:'Daily 17:00–04:00 (Closed 2nd & 4th Tuesdays)', zh:'每日 17:00–04:00 (每月第2、第4周二休)'},
+      addr:{ko:'제주시 서광로32길 18-1', en:'18-1 Seogwang-ro 32-gil, Jeju City', zh:'济州市西光路32街 18-1'},
+      contact:'064-748-1450',
+      channels:{},
+      photos:[
+        '업체폴더/로당(주점)/r1.png',
+        '업체폴더/로당(주점)/r2.png',
+        '업체폴더/로당(주점)/r3.png'
+      ] },
+
+    // ── 제주시내 — 바로족발 (제주시 1등 족발) ──
+    { id:'js6', region:'jeju-si', category:'food',
+      name:{ ko:'바로족발', en:'Baro Jokbal', zh:'巴罗猪蹄' },
+      place:'jeju-si, 진군1길',
+      x:575, y:222,
+      desc:{
+        ko:'제주시 명실상부 1등 족발집. 외국인 손님도 많고, 웨이팅 있을 수 있음. 배달도 가능.',
+        en:'Jeju City’s undisputed #1 jokbal house. Popular with foreign guests too — expect a wait. Delivery available.',
+        zh:'济州市名副其实的第一猪蹄店。外国客人也常来,可能需要等位。提供外送。'
+      },
+      rating:4.7, reviewCount:0,
+      highlights:{
+        ko:['제주시 1등 족발','외국인 손님 환영','배달 가능 · 웨이팅 있을 수 있음'],
+        en:['#1 jokbal in Jeju City','Foreigner-friendly','Delivery available — possible wait'],
+        zh:['济州市第一猪蹄店','欢迎外国客人','可外送·可能需要等位']
+      },
+      hours:{ko:'매일 16:00~24:00 (연중무휴)', en:'Daily 16:00–24:00 (Open year-round)', zh:'每日 16:00–24:00 (全年无休)'},
+      addr:{ko:'제주시 진군1길 25', en:'25 Jingun 1-gil, Jeju City', zh:'济州市真军1街 25'},
+      contact:'064-744-5585',
+      channels:{},
+      photos:[
+        '업체폴더/바로족발(식당)/b1.png',
+        '업체폴더/바로족발(식당)/b2.png',
+        '업체폴더/바로족발(식당)/b3.png'
+      ] },
+
+    // ── 제주시내 (공항 근접) — 정든제주 ──
+    { id:'js3', region:'jeju-si', category:'realty',
+      name:{ ko:'정든제주', en:'Jungdeun Jeju Real Estate', zh:'情念济州房产' },
+      place:'jeju-si, 일주서로 · near airport',
+      x:530, y:225,
+      desc:{
+        ko:'제주에서 한 달 살기 · 집 구하기 · 부동산. 외국인 환영, 15년 무사고 책임 계약.',
+        en:'Monthly stays · home finding · real estate in Jeju. Foreigner-friendly, 15 years accident-free, full responsibility.',
+        zh:'济州一个月生活·找房·房产。欢迎外国人,15年无事故责任合同。'
+      },
+      rating:4.7, reviewCount:0,
+      highlights:{
+        ko:['15년 무사고 책임 계약','외국인 환영','한 달 살기 · 장기 거주 전문'],
+        en:['15 years accident-free · full responsibility','Foreigner-friendly','Specializing in monthly & long stays'],
+        zh:['15年无事故责任合同','欢迎外国人','一个月生活·长租专门']
+      },
+      hours:{ko:'매일 9:00~18:00', en:'Daily 9:00–18:00', zh:'每日 9:00–18:00'},
+      addr:{ko:'제주시 일주서로 7827-1 1층 101호', en:'7827-1 Iljuseo-ro, Unit 101, Jeju City', zh:'济州市一周西路 7827-1 1楼 101号'},
+      contact:'010-2106-3651',
+      channels:{
+        homepage:'https://ian0417kim-afk.github.io/jung-deun/'
+      },
+      photos:[
+        '업체폴더/정든제주부동산(숙소,집구하기)/j1.jpg',
+        '업체폴더/정든제주부동산(숙소,집구하기)/j11.png',
+        '업체폴더/정든제주부동산(숙소,집구하기)/j22.png'
+      ] },
+
+    // ── 제주시내 — 그러므로 (수목원길 카페) ──
+    { id:'js7', region:'jeju-si', category:'cafe',
+      name:{ ko:'그러므로', en:'Glomuro', zh:'Glomuro 咖啡' },
+      place:'jeju-si, 수목원길',
+      x:495, y:235,
+      desc:{
+        ko:'제주시 수목원 옆 도심 숲속 카페. 진저라떼가 시그니처, 차 한 잔의 여유와 넓은 주차장.',
+        en:'A forest-edge city café next to Jeju Arboretum. Ginger latte is the signature; quiet vibe, ample parking.',
+        zh:'济州市树木园旁的都市森林咖啡馆。招牌姜汁拿铁,惬意氛围,停车场宽敞。'
+      },
+      rating:4.4, reviewCount:0,
+      highlights:{
+        ko:['수목원 옆 도심 숲속 카페','시그니처 진저라떼','넓은 주차장'],
+        en:['Forest-edge city café','Signature ginger latte','Spacious parking'],
+        zh:['都市森林咖啡馆','招牌姜汁拿铁','停车场宽敞']
+      },
+      hours:{ko:'매일 10:00~21:00', en:'Daily 10:00–21:00', zh:'每日 10:00–21:00'},
+      addr:{ko:'제주시 수목원길 16-14', en:'16-14 Sumokwon-gil, Jeju City', zh:'济州市树木园路 16-14'},
+      contact:'070-8844-2984',
+      channels:{
+        instagram:'https://www.instagram.com/glomuro_coffee/'
+      },
+      photos:[
+        '업체폴더/그러므로(카페)/G1.png',
+        '업체폴더/그러므로(카페)/G3.png',
+        '업체폴더/그러므로(카페)/G2.png'
+      ] },
+
+    // ── 제주시내 — 만강촌 (닭칼국수 맛집) ──
+    { id:'js8', region:'jeju-si', category:'food',
+      name:{ ko:'만강촌', en:'Mangangchon', zh:'滿江村' },
+      place:'jeju-si, 월랑로',
+      x:540, y:208,
+      desc:{
+        ko:'제주시 닭칼국수 맛집. 도민이 인정한 가성비 한 그릇 — 통닭, 초계면, 만두까지.',
+        en:'Jeju City’s go-to dak-kalguksu (chicken noodle soup). A local-approved value spot — fried chicken, chogyemyeon and dumplings too.',
+        zh:'济州市鸡肉刀削面名店。本地人认证的高性价比一碗 — 炸鸡、酢鸡冷面、饺子也都有。'
+      },
+      rating:4.7, reviewCount:0,
+      highlights:{
+        ko:['닭칼국수 맛집','도민 인정 가성비','통닭 · 초계면 · 만두'],
+        en:['Famous dak-kalguksu','Local-approved value','Fried chicken · chogyemyeon · dumplings'],
+        zh:['鸡肉刀削面名店','本地人推荐高性价比','炸鸡·酢鸡冷面·饺子']
+      },
+      hours:{ko:'매일 7:00~21:30', en:'Daily 7:00–21:30', zh:'每日 7:00–21:30'},
+      addr:{ko:'제주시 월랑로 42', en:'42 Wolrang-ro, Jeju City', zh:'济州市月廊路 42'},
+      contact:'064-744-4780',
+      channels:{},
+      photos:[
+        '업체폴더/만강촌(식당)/M2.png',
+        '업체폴더/만강촌(식당)/M1.png',
+        '업체폴더/만강촌(식당)/M3.png'
+      ] }
+
+  ];
+
+  const AIRPORT = { x: 545, y: 225 };
+
+  // ============================================================================
+  //   ↑ 데이터 영역 끝.  ↓ 시스템 코드 (수정 불필요)
+  // ============================================================================
+
+  // Helpers
+  function businessesIn(regionKey)            { return BUSINESSES.filter(b => b.region === regionKey); }
+  function businessesInCat(regionKey, catKey) { return BUSINESSES.filter(b => b.region === regionKey && b.category === catKey); }
+  function categoriesIn(regionKey) {
+    const cats = new Set();
+    businessesIn(regionKey).forEach(b => cats.add(b.category));
+    return Object.keys(CATEGORIES).filter(c => cats.has(c));
+  }
+  function findBusiness(id) { return BUSINESSES.find(b => b.id === id); }
+  function renderStars(rating) {
+    const r = rating || 0;
+    const filled = Math.floor(r);
+    const half = (r - filled) >= 0.5 ? 1 : 0;
+    const empty = 5 - filled - half;
+    return '★'.repeat(filled) + (half ? '⯨' : '') + '☆'.repeat(empty);
+  }
+  function renderStarsMini(rating) {
+    const r = rating || 0;
+    const filled = Math.floor(r);
+    const half = (r - filled) >= 0.5 ? 1 : 0;
+    const empty = 5 - filled - half;
+    return '★'.repeat(filled) + (half ? '⯨' : '') + '☆'.repeat(empty);
+  }
+
+  // Update header counts
+  document.getElementById('statRegions').textContent = Object.keys(REGIONS).length;
+  document.getElementById('statBiz').textContent = BUSINESSES.length;
+
+  // Drawing
+  const svg = document.getElementById('jejuMap');
+  const replayBtn = document.getElementById('replayBtn');
+  function startDrawing() {
+    svg.classList.remove('play'); void svg.offsetWidth;
+    svg.classList.add('play'); clearJourney();
+    animateOpeningPencil();
+  }
+  function animateOpeningPencil() {
+    const path = document.getElementById('mainCoast');
+    const cursor = document.getElementById('pencilCursor');
+    const total = path.getTotalLength();
+    const t0 = performance.now() + 600;
+    function tick(now) {
+      const elapsed = now - t0;
+      if (elapsed < 0) { requestAnimationFrame(tick); return; }
+      if (elapsed >= 3000) return;
+      const point = path.getPointAtLength((elapsed/3000) * total);
+      cursor.setAttribute('transform', `translate(${point.x},${point.y})`);
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  replayBtn.addEventListener('click', startDrawing);
+  window.addEventListener('load', startDrawing);
+
+  // Panel state
+  const panel = document.getElementById('bizPanel');
+  const panelTitle = document.getElementById('panelTitle');
+  const panelEn = document.getElementById('panelEn');
+  const panelMeta = document.getElementById('panelMeta');
+  const panelBody = document.getElementById('panelBody');
+  const panelClose = document.getElementById('panelClose');
+  const panelBack = document.getElementById('panelBack');
+  const panelBackLabel = document.getElementById('panelBackLabel');
+  const regionAreas = document.getElementById('regionAreas');
+
+  let currentRegionKey = null;
+  let currentCategoryKey = null;
+  let panelLockedOpen = false;
+
+  function setActiveRegion(key) {
+    regionAreas.querySelectorAll('.region-area').forEach(el => {
+      el.classList.toggle('active', el.dataset.region === key);
+    });
+  }
+
+  function renderPanel() {
+    const region = REGIONS[currentRegionKey];
+    if (!region) return;
+    const regSub = (typeof region.sub === 'object') ? (region.sub[currentLang] || region.sub.ko) : region.sub;
+    const regMain = region[currentLang] || region.ko;
+    const regAlt = currentLang === 'ko' ? region.en : region.ko;
+    panelMeta.textContent = `— ${regSub}`;
+    panelTitle.firstChild.textContent = regMain;
+    panelEn.textContent = regAlt;
+
+    if (currentCategoryKey === null) {
+      panelBack.classList.remove('show');
+      const cats = categoriesIn(currentRegionKey);
+      if (cats.length === 0) {
+        panelBody.innerHTML = `<div class="empty"><strong>${t('emptySoon')}</strong>${t('emptyDesc')}</div>`;
+        return;
+      }
+      const items = cats.map((catKey, i) => {
+        const cat = CATEGORIES[catKey];
+        const count = businessesInCat(currentRegionKey, catKey).length;
+        const catMain = cat[currentLang] || cat.ko;
+        const catAlt = currentLang === 'ko' ? cat.en : cat.ko;
+        return `<li data-cat="${catKey}">
+          <div class="cat-num">${String(i+1).padStart(2,'0')}</div>
+          <div class="cat-icon">${cat.icon}</div>
+          <div class="cat-name">${catMain}<small>${catAlt}</small></div>
+          <div class="cat-count"><strong>${count}</strong>${t('placesCountSuffix')}</div>
+          <div class="arrow">→</div>
+        </li>`;
+      }).join('');
+      panelBody.innerHTML = `<ul class="cat-list">${items}</ul>`;
+      panelBody.querySelectorAll('.cat-list li').forEach(li => {
+        li.addEventListener('click', () => {
+          currentCategoryKey = li.dataset.cat;
+          renderPanel();
+        });
+      });
+    } else {
+      panelBack.classList.add('show');
+      panelBackLabel.textContent = `${regMain} ${t('backToCategory')}`;
+      const cat = CATEGORIES[currentCategoryKey];
+      const catMain = cat[currentLang] || cat.ko;
+      panelMeta.textContent = `— ${regMain} / ${catMain}`;
+      const list = businessesInCat(currentRegionKey, currentCategoryKey);
+      if (list.length === 0) {
+        panelBody.innerHTML = `<div class="empty"><strong>${t('emptySoon')}</strong>${t('emptyDesc')}</div>`;
+        return;
+      }
+      const items = list.map((b, i) => {
+        const badges = [];
+        if (b.status === 'new') badges.push('<span class="new-badge">NEW</span>');
+        if (b.localGem) badges.push('<span class="local-badge">LOCAL</span>');
+        const badgeHtml = badges.length
+          ? `<div class="badge-row">${badges.join('')}</div>`
+          : (b.rating ? `<div class="stars-mini">${renderStarsMini(b.rating)}<span class="num">${(b.rating).toFixed(1)} · ${b.reviewCount||0}</span></div>` : '');
+        return `
+        <li data-biz="${b.id}">
+          <div class="num">${String(i+1).padStart(2,'0')}</div>
+          <div class="body">
+            ${badgeHtml}
+            <h3>${bizName(b)}</h3>
+            <div class="place">${b.place}</div>
+          </div>
+          <div class="arrow">→</div>
+        </li>`;
+      }).join('');
+      panelBody.innerHTML = `<ul class="biz-list">${items}</ul>`;
+      panelBody.querySelectorAll('.biz-list li').forEach(li => {
+        li.addEventListener('click', () => {
+          const b = findBusiness(li.dataset.biz);
+          if (b) onBusinessClick(b);
+        });
+      });
+    }
+  }
+
+  function openPanelForRegion(key, lock) {
+    const region = REGIONS[key];
+    if (!region) return;
+    if (panelLockedOpen && !lock && currentRegionKey !== key) return;
+    const wantLeft = region.panelSide === 'left';
+    // 모바일에서는 권역이 지도 아래쪽이면 패널을 위쪽에(기본), 권역이 지도 위쪽이면 패널을 아래쪽에 표시
+    const wantBottom = region.panelVert === 'bottom';
+    const isOpen = panel.classList.contains('open');
+    const isLeft = panel.classList.contains('left-side');
+    const isBottom = panel.classList.contains('bottom-side');
+    const switchingRegion = currentRegionKey !== key;
+    const orientationChanged = (wantLeft !== isLeft) || (wantBottom !== isBottom);
+    setActiveRegion(key);
+    if (switchingRegion) { currentRegionKey = key; currentCategoryKey = null; }
+    if (isOpen && orientationChanged) {
+      panel.classList.remove('open');
+      setTimeout(() => {
+        panel.classList.toggle('left-side', wantLeft);
+        panel.classList.toggle('bottom-side', wantBottom);
+        renderPanel();
+        panel.classList.add('open');
+        panel.setAttribute('aria-hidden','false');
+        panel.classList.toggle('locked', !!lock || panelLockedOpen);
+      }, 230);
+    } else {
+      if (!isOpen) {
+        panel.classList.toggle('left-side', wantLeft);
+        panel.classList.toggle('bottom-side', wantBottom);
+      }
+      renderPanel();
+      panel.classList.add('open');
+      panel.setAttribute('aria-hidden','false');
+    }
+    if (lock) panelLockedOpen = true;
+    panel.classList.toggle('locked', panelLockedOpen);
+  }
+
+  function closePanel() {
+    panel.classList.remove('open');
+    panel.classList.remove('locked');
+    panel.setAttribute('aria-hidden','true');
+    setActiveRegion(null);
+    currentCategoryKey = null;
+    currentRegionKey = null;
+    panelLockedOpen = false;
+  }
+
+  panelClose.addEventListener('click', () => { closePanel(); clearJourney(); });
+  panelBack.addEventListener('click', () => {
+    currentCategoryKey = null;
+    renderPanel();
+  });
+
+  let leaveTimer = null;
+  function shouldKeepPanel() {
+    if (panelLockedOpen) return true;
+    if (currentCategoryKey !== null) return true;
+    return panel.matches(':hover')
+        || !!document.querySelector('.region-area:hover')
+        || !!document.querySelector('.region-label:hover');
+  }
+  function scheduleClose() {
+    clearTimeout(leaveTimer);
+    leaveTimer = setTimeout(() => { if (!shouldKeepPanel()) closePanel(); }, 280);
+  }
+
+  const regionTriggers = [
+    ...document.querySelectorAll('.region-area'),
+    ...document.querySelectorAll('.region-label')
+  ];
+  regionTriggers.forEach(el => {
+    const key = el.dataset.region;
+    el.addEventListener('mouseenter', () => { clearTimeout(leaveTimer); openPanelForRegion(key, false); });
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (panelLockedOpen && currentRegionKey === key && currentCategoryKey === null) {
+        closePanel(); clearJourney();
+      } else {
+        openPanelForRegion(key, true);
+      }
+    });
+    el.addEventListener('mouseleave', scheduleClose);
+    if (el.classList.contains('region-label')) {
+      el.addEventListener('focus', () => openPanelForRegion(key, true));
+      el.setAttribute('tabindex','0');
+    }
+  });
+  panel.addEventListener('mouseenter', () => clearTimeout(leaveTimer));
+  panel.addEventListener('mouseleave', scheduleClose);
+
+  // Journey
+  const journeyGroup = document.getElementById('journey');
+  const journeyPencil = document.getElementById('journeyPencil');
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const PIXELS_PER_KM = 1200 / 90;
+  const cardinalDir = (dx, dy) => {
+    const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+    if (ang >= -22.5 && ang < 22.5) return '동쪽';
+    if (ang >= 22.5 && ang < 67.5) return '남동쪽';
+    if (ang >= 67.5 && ang < 112.5) return '남쪽';
+    if (ang >= 112.5 && ang < 157.5) return '남서쪽';
+    if (ang >= 157.5 || ang < -157.5) return '서쪽';
+    if (ang >= -157.5 && ang < -112.5) return '북서쪽';
+    if (ang >= -112.5 && ang < -67.5) return '북쪽';
+    if (ang >= -67.5 && ang < -22.5) return '북동쪽';
+    return '';
+  };
+
+  function clearJourney() {
+    journeyGroup.innerHTML = '';
+    journeyPencil.style.opacity = 0;
+  }
+
+  function drawJourney(business, onComplete) {
+    clearJourney();
+    const fromX = AIRPORT.x, fromY = AIRPORT.y;
+    const toX = business.x, toY = business.y;
+    const dx = toX - fromX, dy = toY - fromY;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const midX = (fromX + toX) / 2, midY = (fromY + toY) / 2;
+    const perpX = -dy / dist, perpY = dx / dist;
+    const bow = Math.min(40, dist * 0.18);
+    const cx = 600, cy = 360;
+    const outX = midX - cx, outY = midY - cy;
+    const sign = (outX * perpX + outY * perpY) > 0 ? 1 : -1;
+    const ctrlX = midX + perpX * bow * sign;
+    const ctrlY = midY + perpY * bow * sign - 8;
+    const pathD = `M ${fromX},${fromY} Q ${ctrlX},${ctrlY} ${toX},${toY}`;
+    const path = document.createElementNS(SVG_NS, 'path');
+    path.setAttribute('d', pathD);
+    path.setAttribute('class', 'journey-path');
+    path.setAttribute('filter', 'url(#rough)');
+    journeyGroup.appendChild(path);
+    const length = path.getTotalLength();
+    path.style.strokeDasharray = length;
+    path.style.strokeDashoffset = length;
+    const pulse = document.createElementNS(SVG_NS, 'circle');
+    pulse.setAttribute('cx', fromX); pulse.setAttribute('cy', fromY);
+    pulse.setAttribute('class', 'journey-pulse');
+    journeyGroup.appendChild(pulse);
+    requestAnimationFrame(() => pulse.classList.add('go'));
+    const duration = Math.min(2200, Math.max(900, dist * 4));
+    const t0 = performance.now();
+    journeyPencil.style.opacity = 1;
+    function tick(now) {
+      const elapsed = now - t0;
+      const p = Math.min(1, elapsed / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const point = path.getPointAtLength(eased * length);
+      journeyPencil.setAttribute('transform', `translate(${point.x},${point.y})`);
+      path.style.strokeDashoffset = length * (1 - eased);
+      if (p < 1) requestAnimationFrame(tick);
+      else {
+        const flag = document.createElementNS(SVG_NS, 'g');
+        flag.setAttribute('class', 'journey-flag');
+        flag.setAttribute('transform', `translate(${toX},${toY})`);
+        flag.innerHTML = `<line x1="0" y1="0" x2="0" y2="-22" stroke="#B8432B" stroke-width="1.6" stroke-linecap="round"/><path d="M 0,-22 L 14,-18 L 0,-13 Z" fill="#B8432B"/><circle cx="0" cy="0" r="3" fill="#B8432B"/><circle cx="0" cy="0" r="6" fill="none" stroke="#B8432B" stroke-width="1" opacity="0.5"/>`;
+        journeyGroup.appendChild(flag);
+        requestAnimationFrame(() => flag.classList.add('show'));
+        setTimeout(() => { journeyPencil.style.opacity = 0; }, 250);
+        if (onComplete) onComplete({ dist, dx, dy });
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // Modal
+  const modal = document.getElementById('modalBack');
+  const modalCat = document.getElementById('modalCat');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalPlace = document.getElementById('modalPlace');
+  const modalDesc = document.getElementById('modalDesc');
+  const modalHours = document.getElementById('modalHours');
+  const modalAddr = document.getElementById('modalAddr');
+  const modalContact = document.getElementById('modalContact');
+  const modalChannels = document.getElementById('modalChannels');
+  const modalClose = document.getElementById('modalClose');
+  const modalDist = document.getElementById('modalDist');
+  const modalDir = document.getElementById('modalDir');
+  const modalStars = document.getElementById('modalStars');
+  const modalRating = document.getElementById('modalRating');
+  const modalReviews = document.getElementById('modalReviews');
+  const modalHighlights = document.getElementById('modalHighlights');
+
+  // Slideshow
+  let slideIdx = 0;
+  let slideTimer = null;
+  const TOTAL_SLIDES = 3;
+  function showSlide(i) {
+    slideIdx = (i + TOTAL_SLIDES) % TOTAL_SLIDES;
+    document.getElementById('slides').style.transform = `translateX(-${slideIdx * 100}%)`;
+    document.querySelectorAll('.slide-dot').forEach((d, idx) => d.classList.toggle('active', idx === slideIdx));
+  }
+  function startSlideshow() {
+    stopSlideshow();
+    slideTimer = setInterval(() => showSlide(slideIdx + 1), 4500);
+  }
+  function stopSlideshow() {
+    if (slideTimer) { clearInterval(slideTimer); slideTimer = null; }
+  }
+  document.getElementById('slidePrev').addEventListener('click', (e) => { e.stopPropagation(); showSlide(slideIdx - 1); startSlideshow(); });
+  document.getElementById('slideNext').addEventListener('click', (e) => { e.stopPropagation(); showSlide(slideIdx + 1); startSlideshow(); });
+  document.querySelectorAll('.slide-dot').forEach((d, i) => {
+    d.addEventListener('click', (e) => { e.stopPropagation(); showSlide(i); startSlideshow(); });
+  });
+
+  function bizName(b) {
+    if (typeof b.name === 'object') return b.name[currentLang] || b.name.ko;
+    return b.name;
+  }
+  function bizDesc(b) {
+    if (typeof b.desc === 'object') return b.desc[currentLang] || b.desc.ko;
+    return b.desc;
+  }
+  function bizHighlights(b) {
+    if (b.highlights && typeof b.highlights === 'object' && !Array.isArray(b.highlights)) {
+      return b.highlights[currentLang] || b.highlights.ko;
+    }
+    return b.highlights;
+  }
+
+  function onBusinessClick(b) {
+    drawJourney(b, ({ dist, dx, dy }) => {
+      const km = (dist / PIXELS_PER_KM).toFixed(1);
+      const dirKo = cardinalDir(dx, dy);
+      const dir = UI_LANG.direction[currentLang] ? (UI_LANG.direction[currentLang][dirKo] || dirKo) : dirKo;
+      const cat = CATEGORIES[b.category];
+      const catText = cat ? (cat[currentLang] || cat.ko) : b.category;
+
+      const badges = [];
+      if (b.status === 'new') badges.push('<span class="new-badge-large">NEW</span>');
+      if (b.localGem) badges.push('<span class="local-badge-large">LOCAL</span>');
+      const badgeHtml = badges.length ? `<span class="badge-row">${badges.join('')}</span>` : '';
+      modalCat.innerHTML = `${badgeHtml}— ${catText}`;
+      modalTitle.textContent = bizName(b);
+      modalPlace.textContent = b.place;
+      modalDesc.textContent = bizDesc(b);
+      // 다국어 hours/addr 처리 (객체면 현재 언어 선택, 문자열이면 그대로)
+      const pickLang = (val) => {
+        if (val && typeof val === 'object') return val[currentLang] || val.ko || '';
+        return val || '';
+      };
+      modalHours.textContent = pickLang(b.hours);
+      modalAddr.textContent = pickLang(b.addr);
+      modalContact.textContent = b.contact;
+      // Render channel buttons
+      const channels = b.channels || {};
+      const labels = {
+        blog:      { ko:'블로그',   en:'Blog',     zh:'博客',    icon:'✎' },
+        instagram: { ko:'인스타그램', en:'Instagram', zh:'Instagram', icon:'◉' },
+        homepage:  { ko:'홈페이지', en:'Website',  zh:'官网',    icon:'⌂' },
+        kakao:     { ko:'카카오맵', en:'Kakao Map', zh:'地图',   icon:'◈' }
+      };
+      const btns = [];
+      ['blog','instagram','homepage','kakao'].forEach((k, i) => {
+        if (channels[k]) {
+          const lab = labels[k];
+          const text = lab[currentLang] || lab.ko;
+          btns.push(`<a class="channel-btn ${i===0?'primary':''} ${k==='kakao'?'kakao':''}" href="${channels[k]}" target="_blank" rel="noopener"><span class="icon">${lab.icon}</span> ${text} ↗</a>`);
+        }
+      });
+      if (btns.length === 0) {
+        const noChannelText = { ko:'외부 채널 없음 — 카카오맵에서 검색', en:'No external channels — search on Kakao Map', zh:'无外部链接 — 在地图搜索' };
+        const searchQuery = encodeURIComponent((typeof b.name === 'object' ? b.name.ko : b.name) || '');
+        modalChannels.className = 'channel-buttons';
+        modalChannels.innerHTML = `<a class="channel-btn kakao" href="https://map.kakao.com/?q=${searchQuery}" target="_blank" rel="noopener"><span class="icon">◈</span> ${labels.kakao[currentLang] || labels.kakao.ko} ↗</a>`;
+      } else {
+        modalChannels.className = 'channel-buttons' + (btns.length === 2 ? ' two' : btns.length === 3 ? ' three' : '');
+        modalChannels.className = 'channel-buttons' + (btns.length === 2 ? ' two' : btns.length === 3 ? ' three' : '');
+        modalChannels.innerHTML = btns.join('');
+      }
+      modalDist.textContent = `${km} km`;
+      modalDir.textContent = dir;
+
+      const ratingRow = modalStars.parentElement;
+      if (b.rating != null) {
+        modalStars.textContent = renderStars(b.rating);
+        modalRating.textContent = (b.rating).toFixed(1);
+        modalReviews.textContent = `${b.reviewCount || 0} ${t('reviews')}`;
+        if (ratingRow) ratingRow.style.display = '';
+      } else {
+        if (ratingRow) ratingRow.style.display = 'none';
+      }
+
+      modalHighlights.innerHTML = (bizHighlights(b) || []).map(h => `<li>${h}</li>`).join('');
+
+      const iconHtml = cat ? cat.icon : '';
+      const hasPhotos = b.photos && b.photos.length > 0;
+      for (let i = 1; i <= 3; i++) {
+        const slideIcon = document.getElementById(`slideIcon${i}`);
+        const slide = slideIcon.closest('.slide');
+        if (hasPhotos && b.photos[i-1]) {
+          slideIcon.innerHTML = `<img src="${b.photos[i-1]}" alt=""/>`;
+          if (slide) slide.classList.add('has-photo');
+        } else {
+          slideIcon.innerHTML = iconHtml;
+          if (slide) slide.classList.remove('has-photo');
+        }
+      }
+      showSlide(0);
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      startSlideshow();
+    });
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden','true');
+    stopSlideshow();
+  }
+  modalClose.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (modal.classList.contains('open')) closeModal();
+      else if (panel.classList.contains('open')) { closePanel(); clearJourney(); }
+    }
+  });
+
+  // Language switching
+  function setLanguage(lang) {
+    if (!['ko','en','zh'].includes(lang)) return;
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.querySelectorAll('header.masthead .lang button').forEach(b => {
+      b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      if (UI_LANG[key]) el.textContent = UI_LANG[key][lang] || UI_LANG[key].ko;
+    });
+    document.querySelectorAll('.region-label').forEach(g => {
+      const key = g.dataset.region;
+      const reg = REGIONS[key];
+      if (!reg) return;
+      const txtMain = g.querySelector('text.name');
+      const txtSub = g.querySelector('text.name-en');
+      if (lang === 'ko') {
+        if (txtMain) txtMain.textContent = reg.ko;
+        if (txtSub) txtSub.textContent = reg.en;
+      } else if (lang === 'en') {
+        if (txtMain) txtMain.textContent = reg.en;
+        if (txtSub) txtSub.textContent = reg.ko;
+      } else if (lang === 'zh') {
+        if (txtMain) txtMain.textContent = reg.zh;
+        if (txtSub) txtSub.textContent = reg.ko;
+      }
+    });
+    const sR = document.getElementById('statRegionsLabel');
+    const sB = document.getElementById('statBizLabel');
+    const sL = document.getElementById('statLangsLabel');
+    if (sR) sR.textContent = t('statRegions');
+    if (sB) sB.textContent = t('statBiz');
+    if (sL) sL.textContent = t('statLangs');
+    if (currentRegionKey) renderPanel();
+    if (panelBack.classList.contains('show')) {
+      const reg = REGIONS[currentRegionKey];
+      if (reg) panelBackLabel.textContent = `${reg[currentLang] || reg.ko} ${t('backToCategory')}`;
+    }
+  }
+  document.querySelectorAll('header.masthead .lang button').forEach(btn => {
+    btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+  });
+
+  // Update header counts
+  const statRegionsEl = document.getElementById('statRegions');
+  const statBizEl = document.getElementById('statBiz');
+  if (statRegionsEl) statRegionsEl.textContent = Object.keys(REGIONS).length;
+  if (statBizEl) statBizEl.textContent = BUSINESSES.length;
+</script>
+</body>
+</html>
